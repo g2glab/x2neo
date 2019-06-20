@@ -1,0 +1,6 @@
+db:
+    dbms: "neo4j"
+    host: "http://localhost"
+    port: 7474
+web:
+    port: 3000
