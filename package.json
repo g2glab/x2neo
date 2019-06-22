@@ -6,12 +6,13 @@
   "scripts": {
     "dev": "parcel --target node src/*",
     "build": "parcel build --target node src/*",
-    "watch": "parcel watch --target node src/*;",
-    "start": "nodemon dist/server.js",
+    "watch": "parcel watch --target node src/*",
+    "start": "nodemon dist/server.js -d 0.2",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@types/node-fetch": "^2.3.7",
+    "@types/swagger-jsdoc": "^0.0.2",
     "axios": "^0.19.0",
     "config": "^3.1.0",
     "express": "^4.16.4",
