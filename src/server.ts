@@ -1,10 +1,10 @@
 import express, { Request, Response } from "express";
 import swaggerJSDoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+import ConfigFile from 'config';
 
-var ConfigFile = require('config');
-
-// const fetch = require ('node-fetch');
 var graph = require('./graph');
+var traversal = require('/traversal');
 
 const app = express();
 
@@ -20,10 +20,13 @@ var options = {
     swaggerDefinition: {
         info: {
             title: 'X2 API',
-            version: '1.0.0'
+            version: '1.0.0',
+            license: {
+                name: "MIT"
+            }
         },
     },
-    apis: ['src/graph.ts'],
+    apis: ['src/*.ts'],
 };
 
 var swaggerSpec = swaggerJSDoc(options);
@@ -33,7 +36,16 @@ app.get('/api-docs.json', function(req, res){
     res.send(swaggerSpec);
 });
 
+var ui_options = {
+    explorer: true
+};
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, ui_options));
+
+// GRAPH API
+
 app.use("/graph", graph);
+app.use("/traversal", traversal);
 
 app.get("/", (_req: Request, res: Response) => res.send("Hello World!"));
 

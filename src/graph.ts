@@ -8,22 +8,53 @@ var router = express.Router()
  * @swagger
  * /graph:
  *   get:
+ *     summary: "Graph Retrieval"
+ *     tags:
+ *       - name: Retrieval
  *     description: Get graphs with filtering 
  *     produces:
  *       - application/json
  *     parameters:
  *       - name: node_ids
  *         description: Filter by edges that both ends of edges are included in given node ids.
- *         type: number
+ *         in: "query"
+ *         type: array
+ *         items: 
+ *           type: integer
  *       - name: node_labels
  *         description: Filter by edges that both ends of edges have any of given node labels.
- *         type: string
+ *         in: "query"
+ *         type: array
+ *         items:
+ *           type: string
  *       - name: node_props
  *         description: Filter by edges that both ends of edges have any of given node props.
- *         type: key:value
+ *         type: array
+ *         in: "query"
+ *         items:
+ *           type: string
+ *       - name: edge_ids
+ *         description: Filter by edges such that those ids are included in given edge ids.
+ *         type: array
+ *         items: 
+ *           type: integer
+ *         in: "query"
+ *       - name: edge_labels
+ *         description: Filter by edges such that those ids are included in given edge labels.
+ *         type: array
+ *         items: 
+ *           type: string
+ *         in: "query"
+ *       - name: edge_props
+ *         description: Filter by edges such that those ids are included in given edge props.
+ *         type: array
+ *         items: 
+ *           type: string
+ *         in: "query"
  *       - name: limit
+ *         in: "query"
  *         description: limit records of graph
- *         type: number
+ *         type: integer
  *     responses:
  *       200:
  *         description: success
