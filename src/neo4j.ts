@@ -85,13 +85,13 @@ function parse_props_as_array(values: string | Array<string>): Array<[string, st
     let map: [string, string][] = [];
     switch (typeof values) {
         case "string":
-            const pair = values.split(":")
+            const pair = values.split(/\:|\;/);
             map.push([pair[0], pair[1]]);
             break;
     
         default:
             values.forEach(value => {
-                const pair = value.split(":");
+                const pair = value.split(/\:|\;/);
                 map.push([pair[0], pair[1]]);
             })
             break;
