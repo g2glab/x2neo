@@ -4,7 +4,7 @@ import { json } from "body-parser";
 import { stringify } from "querystring";
 var ConfigFile = require('config');
 
-function traverse_cypher(query: string, values: Array<String>, iterator: number): string {
+function traverse_cypher(query: string, values: Array<string>, iterator: number): string {
     switch (query) {
         case "node_ids":
             return `MATCH p = (n)-[*0..${iterator}]->(node) WHERE ID(n) in [${values.join(",")}] WITH *, relationships(p) AS rels WITH *, nodes(p) AS ns UNWIND rels as r UNWIND ns as na RETURN DISTINCT r, na`
@@ -15,19 +15,19 @@ function traverse_cypher(query: string, values: Array<String>, iterator: number)
             break;
     
         case "node_props":
-            return `MATCH p = (n)-[*0..${iterator}]->(node) WHERE (${values.map(value => {return `n.${value[0]} = "${value[1]}"`}).join(" OR ")}) WITH *, relationships(p) AS rels WITH *, nodes(p) AS ns UNWIND rels as r UNWIND ns as na RETURN DISTINCT r, na`
+            return `MATCH p = (n)-[*0..${iterator}]->(node) WHERE (${parse_props_as_array(values).map(value => {return `n.${value[0]} = "${value[1]}"`}).join(" OR ")}) WITH *, relationships(p) AS rels WITH *, nodes(p) AS ns UNWIND rels as r UNWIND ns as na RETURN DISTINCT r, na`
             break;
 
         case "edge_ids":
-            return `MATCH p = ()-[r]-()-[*0..0]->(node) WHERE ID(r) in [${values.join(",")}] WITH *, relationships(p) AS rels WITH *, nodes(p) AS ns UNWIND rels as r UNWIND ns as na RETURN DISTINCT r, na`
+            return `MATCH p = ()-[r]-()-[*0..${iterator}]->(node) WHERE ID(r) in [${values.join(",")}] WITH *, relationships(p) AS rels WITH *, nodes(p) AS ns UNWIND rels as r UNWIND ns as na RETURN DISTINCT r, na`
             break;
 
         case "edge_labels":
-            return `MATCH p = ()-[r]-()-[*0..0]->(node) WHERE TYPE(r) in [${values.join(",")}] WITH *, relationships(p) AS rels WITH *, nodes(p) AS ns UNWIND rels as r UNWIND ns as na RETURN DISTINCT r, na`
+            return `MATCH p = ()-[r]-()-[*0..${iterator}]->(node) WHERE TYPE(r) in [${values.join(",")}] WITH *, relationships(p) AS rels WITH *, nodes(p) AS ns UNWIND rels as r UNWIND ns as na RETURN DISTINCT r, na`
             break;
 
         case "edge_props":
-            return `MATCH p = ()-[r]-()-[*0..0]->(node) WHERE ${values.map(value => {return `r.${value[0]} = "${value[1]}"`}).join(" OR ")} WITH *, relationships(p) AS rels WITH *, nodes(p) AS ns UNWIND rels as r UNWIND ns as na RETURN DISTINCT r, na`
+            return `MATCH p = ()-[r]-()-[*0..${iterator}]->(node) WHERE ${parse_props_as_array(values).map(value => {return `r.${value[0]} = "${value[1]}"`}).join(" OR ")} WITH *, relationships(p) AS rels WITH *, nodes(p) AS ns UNWIND rels as r UNWIND ns as na RETURN DISTINCT r, na`
             break;
 
         default:
@@ -214,6 +214,8 @@ export default class Neo4JHandler {
             options = opts("edge_labels", req.query.edge_labels, limit);
         } else if (req.query.edge_props !== undefined) {
             options = opts("edge_props", req.query.edge_props, limit);
+        } else {
+            res.status(400);
         }
         console.log(req.query, options)
 
