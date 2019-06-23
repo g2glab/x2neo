@@ -21,6 +21,7 @@ var router = express.Router()
  *         type: array
  *         items: 
  *           type: integer
+ *           example: 851
  *       - name: node_labels
  *         description: Filter by edges that both ends of edges have any of given node labels.
  *         in: "query"
@@ -55,6 +56,7 @@ var router = express.Router()
  *         in: "query"
  *         description: limit records of graph
  *         type: integer
+ *         example: 100
  *     responses:
  *       200:
  *         description: success

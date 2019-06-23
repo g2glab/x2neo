@@ -81,29 +81,6 @@ function valuesToArray(values: string | Array<string>): Array<string> {
     }
 }
 
-function parse_props(values: string | Array<string>): Map<string, Array<string>> {
-    let map = new Map<string, Array<string>>();
-    switch (typeof values) {
-        case "string":
-            const pair = values.split(":")
-            map.set(pair[0], [pair[1]])
-            break;
-    
-        default:
-            values.forEach(value => {
-                const pair = value.split(":");
-                let values_pointer = map.get(pair[0]);
-                if (values_pointer === undefined) {
-                    map.set(pair[0], [pair[1]])
-                } else {
-                    values_pointer.push(pair[1])
-                }
-            })
-            break;
-    }
-    return map;
-}
-
 function parse_props_as_array(values: string | Array<string>): Array<[string, string]> {
     let map: [string, string][] = [];
     switch (typeof values) {
@@ -144,20 +121,6 @@ function traverse_opts(query: string, values: string | Array<string>, iteration:
     })
 }
 
-
-const body = {
-    "statements" : [ {
-        "statement" : "Match (n)-[r]-() WHERE r.country=\"Japan\" RETURN n,r",
-        "resultDataContents" : [ "row", "graph" ]
-    } ]
-}
-
-const default_options = {
-    method: 'POST',
-    body: JSON.stringify(body).replace(/\\"/g, '\\"'),
-    headers: {'Content-Type': 'application/json', 'accept': 'application/json', 'Authorization': 'Basic bmVvNGo6bmVvNGp0ZXN0'}
-}
-
 const url = ConfigFile.db.host + ":"+ ConfigFile.db.port
 
 export default class Neo4JHandler {
@@ -165,7 +128,7 @@ export default class Neo4JHandler {
     }
 
     static traverse_graph(req: Request, res: Response) {
-        var options = default_options;
+        var options;
         let iteration = parseInt(req.query.iteration);
         if (iteration < 0) {
             res.status(400);
@@ -186,6 +149,8 @@ export default class Neo4JHandler {
             options = traverse_opts("edge_labels", req.query.edge_labels, iteration, limit);
         } else if (req.query.edge_props !== undefined) {
             options = traverse_opts("edge_props", req.query.edge_props, iteration, limit);
+        } else {
+            res.status(400);
         }
         console.log(req.query, options)
 
@@ -201,7 +166,7 @@ export default class Neo4JHandler {
             res.status(400);
         }
 
-        var options = default_options;
+        var options;
         if (req.query.node_ids !== undefined) {
             options = opts("node_ids", req.query.node_ids, limit);
         } else if (req.query.node_labels !== undefined) {
@@ -215,7 +180,7 @@ export default class Neo4JHandler {
         } else if (req.query.edge_props !== undefined) {
             options = opts("edge_props", req.query.edge_props, limit);
         } else {
-            res.status(400);
+            options = opts("", "", limit);
         }
         console.log(req.query, options)
 
