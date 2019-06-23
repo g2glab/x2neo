@@ -168,20 +168,24 @@ export default class Neo4JHandler {
         var options = default_options;
         let iteration = parseInt(req.query.iteration);
         if (iteration < 0) {
-            res.status(400)
+            res.status(400);
+        }
+        let limit = parseInt(req.query.limit);
+        if (limit <= 0) {
+            res.status(400);
         }
         if (req.query.node_ids !== undefined) {
-            options = traverse_opts("node_ids", req.query.node_ids, iteration, req.query.limit)
+            options = traverse_opts("node_ids", req.query.node_ids, iteration, limit)
         } else if (req.query.node_labels !== undefined) {
-            options = traverse_opts("node_labels", req.query.node_labels, iteration, req.query.limit);
+            options = traverse_opts("node_labels", req.query.node_labels, iteration, limit);
         } else if (req.query.node_props !== undefined) {
-            options = traverse_opts("node_props", req.query.node_props, iteration, req.query.limit);
+            options = traverse_opts("node_props", req.query.node_props, iteration, limit);
         } else if (req.query.edge_ids !== undefined) {
-            options = traverse_opts("edge_ids", req.query.edge_ids, iteration, req.query.limit);
+            options = traverse_opts("edge_ids", req.query.edge_ids, iteration, limit);
         } else if (req.query.edge_labels !== undefined) {
-            options = traverse_opts("edge_labels", req.query.edge_labels, iteration, req.query.limit);
+            options = traverse_opts("edge_labels", req.query.edge_labels, iteration, limit);
         } else if (req.query.edge_props !== undefined) {
-            options = traverse_opts("edge_props", req.query.edge_props, iteration, req.query.limit);
+            options = traverse_opts("edge_props", req.query.edge_props, iteration, limit);
         }
         console.log(req.query, options)
 
@@ -192,19 +196,24 @@ export default class Neo4JHandler {
     }
 
     static get_graph(req: Request, res: Response) {
+        let limit = parseInt(req.query.limit);
+        if (limit <= 0) {
+            res.status(400);
+        }
+
         var options = default_options;
         if (req.query.node_ids !== undefined) {
-            options = opts("node_ids", req.query.node_ids, req.query.limit);
+            options = opts("node_ids", req.query.node_ids, limit);
         } else if (req.query.node_labels !== undefined) {
-            options = opts("node_labels", req.query.node_labels, req.query.limit);
+            options = opts("node_labels", req.query.node_labels, limit);
         } else if (req.query.node_props !== undefined) {
-            options = opts("node_props", req.query.node_props, req.query.limit);
+            options = opts("node_props", req.query.node_props, limit);
         } else if (req.query.edge_ids !== undefined) {
-            options = opts("edge_ids", req.query.edge_ids, req.query.limit);
+            options = opts("edge_ids", req.query.edge_ids, limit);
         } else if (req.query.edge_labels !== undefined) {
-            options = opts("edge_labels", req.query.edge_labels, req.query.limit);
+            options = opts("edge_labels", req.query.edge_labels, limit);
         } else if (req.query.edge_props !== undefined) {
-            options = opts("edge_props", req.query.edge_props, req.query.limit);
+            options = opts("edge_props", req.query.edge_props, limit);
         }
         console.log(req.query, options)
 

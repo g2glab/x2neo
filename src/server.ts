@@ -1,8 +1,8 @@
 import express, { Request, Response } from "express";
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
-import ConfigFile from 'config';
 
+var ConfigFile = require('config');
 var graph = require('./graph');
 var traversal = require('/traversal');
 
@@ -47,6 +47,6 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, ui_options));
 app.use("/graph", graph);
 app.use("/traversal", traversal);
 
-app.get("/", (_req: Request, res: Response) => res.send("Hello World!"));
+app.get("/", (_req: Request, res: Response) => res.send("X2 API"));
 
 app.listen(ConfigFile.web.port, () => console.log("Example app listening on port " + ConfigFile.web.port));

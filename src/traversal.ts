@@ -6,12 +6,12 @@ var router = express.Router()
 
 /**
  * @swagger
- * /graph:
+ * /traversal:
  *   get:
- *     summary: "Graph Retrieval"
+ *     summary: "Graph Traversal"
  *     tags:
- *       - name: Retrieval
- *     description: Get graphs with filtering 
+ *       - name: Traversal
+ *     description: Get graphs with traversing from the specified nodes or edges
  *     produces:
  *       - application/json
  *     parameters:
@@ -51,9 +51,14 @@ var router = express.Router()
  *         items: 
  *           type: string
  *         in: "query"
+ *       - name: iteration
+ *         in: "query"
+ *         description: the number of iteration (>=0).
+ *         type: integer
+ *         required: true
  *       - name: limit
  *         in: "query"
- *         description: limit records of graph
+ *         description: limit records of graph.
  *         type: integer
  *     responses:
  *       200:
@@ -61,10 +66,11 @@ var router = express.Router()
  *       400:
  *         description: invalid parameter
  */
+
 router.get('', function (req: Request, res: Response) {
     switch (ConfigFile.db.dbms) {
         case "neo4j":
-            Neo4JHandler.get_graph(req, res)
+            Neo4JHandler.traverse_graph(req, res)
             break;
     
         default:
