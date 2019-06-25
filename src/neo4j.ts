@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import fetch from 'node-fetch';
 import { json } from "body-parser";
 import { stringify } from "querystring";
+let pg = require('./pg.js');
 var ConfigFile = require('config');
 
 function traverse_cypher(query: string, values: Array<string>, iterator: number): string {
@@ -127,6 +128,32 @@ export default class Neo4JHandler {
     constructor() {
     }
 
+    static neo4j2pg(response: any) {
+        let graph = new pg.Graph();
+        response.results[0].data.forEach(element => {
+            element.graph.nodes.forEach(node_elem => {
+                let node = new pg.Node(node_elem.id);
+                node_elem.labels.forEach(label => {
+                    node.addLabel(label);
+                })
+                Object.keys(node_elem.properties).forEach(key => {
+                    node.addProperty(key, node_elem.properties[key]);
+                })
+                graph.addNode(node.id, node);
+            });
+            element.graph.relationships.forEach(rel => {
+                let edge = new pg.Edge(rel.startNode, rel.endNode);
+                edge.addLabel(rel.type);
+                edge.addProperty('id', rel.id);
+                Object.keys(rel.properties).forEach(key => {
+                    edge.addProperty(key, rel.properties[key]);
+                })
+                graph.addEdge(edge)
+            });
+        });
+        return graph
+    }
+
     static traverse_graph(req: Request, res: Response) {
         var options;
         let iteration = parseInt(req.query.iteration);
@@ -156,7 +183,8 @@ export default class Neo4JHandler {
 
         fetch(url + '/db/data/transaction/commit', options)
             .then(body => body.json())
-            .then(json => res.json(json))
+            //.then(json => res.json(json))
+            .then(json => res.json(Neo4JHandler.neo4j2pg(json)))
             .catch(e => console.error(e));
     }
 
@@ -186,7 +214,8 @@ export default class Neo4JHandler {
 
         fetch(url + '/db/data/transaction/commit', options)
             .then(body => body.json())
-            .then(json => res.json(json))
+            //.then(json => res.json(json))
+            .then(json => res.json(Neo4JHandler.neo4j2pg(json)))
             .catch(e => console.error(e));
     }
 }
