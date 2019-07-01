@@ -11,7 +11,7 @@ var router = express.Router()
  *     summary: "Graph Query"
  *     tags:
  *       - name: Query
- *     description: Get graphs with traversing from the specified nodes or edges
+ *     description: Get graphs with arbitral query.
  *     produces:
  *       - application/json
  *     parameters:
