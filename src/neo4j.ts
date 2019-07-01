@@ -157,7 +157,7 @@ export default class Neo4JHandler {
     static traverse_graph(req: Request, res: Response) {
         var options;
         let iteration = parseInt(req.query.iteration);
-        if (iteration < 0) {
+        if (iteration === NaN || iteration < 0) {
             res.status(400);
         }
         let limit = parseInt(req.query.limit);

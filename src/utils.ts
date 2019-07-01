@@ -1,4 +1,4 @@
-function parse_props(values: string | Array<string>): Map<string, Array<string>> {
+export function parse_props(values: string | Array<string>): Map<string, Array<string>> {
     let map = new Map<string, Array<string>>();
     switch (typeof values) {
         case "string":
