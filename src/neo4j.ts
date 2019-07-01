@@ -130,6 +130,7 @@ export default class Neo4JHandler {
 
     static neo4j2pg(response: any) {
         let graph = new pg.Graph();
+        let edge_ids:{[key: string]: boolean;} = {}
         response.results[0].data.forEach(element => {
             element.graph.nodes.forEach(node_elem => {
                 let node = new pg.Node(node_elem.id);
@@ -148,7 +149,10 @@ export default class Neo4JHandler {
                 Object.keys(rel.properties).forEach(key => {
                     edge.addProperty(key, rel.properties[key]);
                 })
-                graph.addEdge(edge)
+                if (edge_ids[rel.id] !== true) {
+                    edge_ids[rel.id] = true;
+                    graph.addEdge(edge);
+                }
             });
         });
         return graph
@@ -185,7 +189,7 @@ export default class Neo4JHandler {
             .then(body => body.json())
             //.then(json => res.json(json))
             .then(json => res.json(Neo4JHandler.neo4j2pg(json)))
-            .catch(e => console.error(e));
+            .catch(e => {console.error(e); res.status(500)});
     }
 
     static get_graph(req: Request, res: Response) {
@@ -216,6 +220,6 @@ export default class Neo4JHandler {
             .then(body => body.json())
             //.then(json => res.json(json))
             .then(json => res.json(Neo4JHandler.neo4j2pg(json)))
-            .catch(e => console.error(e));
+            .catch(e => {console.error(e); res.status(500)});
     }
 }
