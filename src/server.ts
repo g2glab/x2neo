@@ -5,6 +5,7 @@ import swaggerUi from 'swagger-ui-express';
 var ConfigFile = require('config');
 var graph = require('./graph');
 var traversal = require('/traversal');
+var query = require('./query');
 
 const app = express();
 
@@ -46,6 +47,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, ui_options));
 
 app.use("/graph", graph);
 app.use("/traversal", traversal);
+app.use("/query", query);
 
 app.get("/", (_req: Request, res: Response) => res.send("X2 API"));
 

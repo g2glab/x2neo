@@ -111,6 +111,17 @@ function opts(query: string, values: string | Array<string>, limit: number): any
     })
 }
 
+function query_opts(query: string): any {
+    return ({
+        method: 'POST',
+        body: JSON.stringify({"statements" : [ {
+            "statement" : query,
+            "resultDataContents" : [ "row", "graph" ]
+        }]}).replace(/\\"/g, '\\"'),
+        headers: {'Content-Type': 'application/json', 'accept': 'application/json', 'Authorization': 'Basic bmVvNGo6bmVvNGp0ZXN0'}
+    })
+}
+
 function traverse_opts(query: string, values: string | Array<string>, iteration: number, limit: number): any {
     return ({
         method: 'POST',
@@ -222,4 +233,13 @@ export default class Neo4JHandler {
             .then(json => res.json(Neo4JHandler.neo4j2pg(json)))
             .catch(e => {console.error(e); res.status(500)});
     }
+
+    static query(req: Request, res: Response) {
+        fetch(url + '/db/data/transaction/commit', query_opts(req.query.q))
+            .then(body => body.json())
+            //.then(json => res.json(json))
+            .then(json => res.json(Neo4JHandler.neo4j2pg(json)))
+            .catch(e => {console.error(e); res.status(500)});
+    }
+
 }

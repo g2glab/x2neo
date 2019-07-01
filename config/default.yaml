@@ -3,5 +3,6 @@ db:
     protocol: "http"
     host: "http://localhost"
     port: 7474
+    query: true
 web:
     port: 3000
