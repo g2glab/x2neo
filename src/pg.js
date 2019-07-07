@@ -2,18 +2,21 @@
 exports.Graph = function() {
 
   //this.nodes = new Map();
-  this.nodes = {};
+  //this.nodes = {};
+  this.nodes = new Array();
   this.edges = new Array();
 
-  this.addNode = function(id, node) {
+  this.addNode = function(node) {
     //this.nodes.set(id, node);
-    this.nodes[id] = node;
+    //this.nodes[id] = node;
+    this.nodes.push(node);
   }
 
   this.addEdge = function(edge) {
     this.edges.push(edge);
   }
 
+  // TO BE DELETED
   this.setNodeLabel = function(id, label) {
     if (node = this.getNode(id)) {
       node.addLabel(label);
@@ -22,14 +25,7 @@ exports.Graph = function() {
     }
   }
 
-  this.setEdgeLabel = function(id, label) {
-    if (edge = this.getEdge(id)) {
-      edge.addLabel(label);
-    } else {
-      console.log('The edge does not exist. ID: ' + id);
-    }
-  }
-
+  // TO BE DELETED
   this.setNodeProperty = function(id, key, value) {
     if (node = this.getNode(id)) {
       node.addProperty(label);
@@ -38,16 +34,9 @@ exports.Graph = function() {
     }
   }
 
-  this.setEdgeProperty = function(id, key, value) {
-    if (edge = this.getEdge(id)) {
-      edge.addProperty(label);
-    } else {
-      console.log('The edge does not exist. ID: ' + id);
-    }
-  }
-
   this.exportJSON = function() {
-    console.log(JSON.stringify(this, null, 2));
+    let json = JSON.stringify(this, null, 2);
+    return json;
   }
 
 }
@@ -71,11 +60,13 @@ exports.Node = function(id) {
   }
 }
 
-exports.Edge = function(id1, id2, undirected) {
+exports.Edge = function(from, to, undirected) {
 
-  this.id1 = id1;
-  this.id2 = id2;
-  this.undirected = undirected;
+  this.from = from;
+  this.to = to;
+  if (undirected) {
+    this.undirected = undirected;
+  }
   //this.labels = new Set();
   //this.properties = new Map();
   this.labels = [];

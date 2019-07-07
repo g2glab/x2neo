@@ -141,6 +141,7 @@ export default class Neo4JHandler {
 
     static neo4j2pg(response: any) {
         let graph = new pg.Graph();
+        let node_ids:{[key: string]: boolean;} = {}
         let edge_ids:{[key: string]: boolean;} = {}
         response.results[0].data.forEach(element => {
             element.graph.nodes.forEach(node_elem => {
@@ -151,10 +152,13 @@ export default class Neo4JHandler {
                 Object.keys(node_elem.properties).forEach(key => {
                     node.addProperty(key, node_elem.properties[key]);
                 })
-                graph.addNode(node.id, node);
+                if (node_ids[node.id] !== true) {
+                    node_ids[node.id] = true;
+                    graph.addNode(node);
+                }
             });
             element.graph.relationships.forEach(rel => {
-                let edge = new pg.Edge(rel.startNode, rel.endNode);
+                let edge = new pg.Edge(rel.startNode, rel.endNode, false);
                 edge.addLabel(rel.type);
                 edge.addProperty('id', rel.id);
                 Object.keys(rel.properties).forEach(key => {
@@ -166,7 +170,7 @@ export default class Neo4JHandler {
                 }
             });
         });
-        return graph
+        return graph;
     }
 
     static traverse_graph(req: Request, res: Response) {
