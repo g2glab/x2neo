@@ -7,8 +7,8 @@
     "dev": "parcel --target node src/*",
     "build": "parcel build --target node src/*",
     "watch": "parcel watch --target node src/*",
-    "start": "nodemon dist/server.js -d 0.2",
-    "run": "node dist/server.js",
+    "monitor": "nodemon dist/server.js -d 0.2",
+    "start": "node dist/server.js",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
