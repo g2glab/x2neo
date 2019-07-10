@@ -3,7 +3,8 @@ import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
 var ConfigFile = require('config');
-var graph = require('./graph');
+var edge_matching = require('./edge_matching');
+var node_matching = require('/node_matching');
 var traversal = require('/traversal');
 var query = require('./query');
 
@@ -45,7 +46,8 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, ui_options));
 
 // GRAPH API
 
-app.use("/graph", graph);
+app.use("/edge_match", edge_matching);
+app.use("/node_match", node_matching);
 app.use("/traversal", traversal);
 app.use("/query", query);
 

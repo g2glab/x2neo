@@ -139,6 +139,11 @@ export default class Neo4JHandler {
     constructor() {
     }
 
+    static neo4jwres2pg(response: any, request: any) {
+        let pg = this.neo4j2pg(response);
+        
+    }
+
     static neo4j2pg(response: any) {
         let graph = new pg.Graph();
         let node_ids:{[key: string]: boolean;} = {}
@@ -175,15 +180,19 @@ export default class Neo4JHandler {
         return graph;
     }
 
-    static traverse_graph(req: Request, res: Response) {
+    static traverse_graph(req: Request, res: Response, is_traversal: boolean) {
         var options;
-        let iteration = parseInt(req.query.iteration);
-        if (iteration === NaN || iteration < 0) {
-            res.status(400);
+        let iteration = is_traversal ? parseInt(req.query.iteration) : 1;
+        if (Number.isNaN(iteration) || iteration < 0) {
+            iteration = 2
         }
         let limit = parseInt(req.query.limit);
-        if (limit <= 0) {
-            res.status(400);
+        if (limit <= 0 || Number.isNaN(limit)) {
+            if (is_traversal) {
+                limit = 1000;
+            } else {
+                limit = 100000;
+            }
         }
         if (req.query.node_ids !== undefined) {
             options = traverse_opts("node_ids", req.query.node_ids, iteration, limit)

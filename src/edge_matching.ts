@@ -6,29 +6,30 @@ var router = express.Router()
 
 /**
  * @swagger
- * /traversal:
+ * /edge_match:
  *   get:
- *     summary: "Graph Traversal"
+ *     summary: "Graph Retrieval By Edge Matching"
  *     tags:
- *       - name: Traversal
- *     description: Get graphs with traversing from the specified nodes or edges
+ *       - name: Retrieval
+ *     description: Get graphs by edge matching
  *     produces:
  *       - application/json
  *     parameters:
  *       - name: node_ids
- *         description: Filter by edges that either end of edges are included in given node ids.
+ *         description: Filter by edges that both ends of edges are included in given node ids.
  *         in: "query"
  *         type: array
  *         items: 
  *           type: integer
+ *           example: 851
  *       - name: node_labels
- *         description: Filter by edges that either end of edges have any of given node labels.
+ *         description: Filter by edges that both ends of edges have any of given node labels.
  *         in: "query"
  *         type: array
  *         items:
  *           type: string
  *       - name: node_props
- *         description: Filter by edges that either end of edges have any of given node props.
+ *         description: Filter by edges that both ends of edges have any of given node props.
  *         type: array
  *         in: "query"
  *         items:
@@ -51,28 +52,21 @@ var router = express.Router()
  *         items: 
  *           type: string
  *         in: "query"
- *       - name: iteration
- *         in: "query"
- *         description: the number of iteration (>=0).
- *         type: integer
- *         required: true
- *         default: 2
  *       - name: limit
  *         in: "query"
- *         description: limit records of graph.
+ *         description: limit records of graph
  *         type: integer
- *         default: 1000
+ *         example: 100
  *     responses:
  *       200:
  *         description: success
  *       400:
  *         description: invalid parameter
  */
-
 router.get('', function (req: Request, res: Response) {
     switch (ConfigFile.db.dbms) {
         case "neo4j":
-            Neo4JHandler.traverse_graph(req, res, true)
+            Neo4JHandler.get_graph(req, res)
             break;
     
         default:
