@@ -175,9 +175,9 @@ export default class Neo4JHandler {
         return graph;
     }
 
-    static traverse_graph(req: Request, res: Response) {
+    static traverse_graph(req: Request, res: Response, is_traversal: boolean) {
         var options;
-        let iteration = parseInt(req.query.iteration);
+        let iteration = is_traversal ? parseInt(req.query.iteration) : 1;
         if (iteration === NaN || iteration < 0) {
             res.status(400);
         }
