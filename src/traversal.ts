@@ -56,10 +56,12 @@ var router = express.Router()
  *         description: the number of iteration (>=0).
  *         type: integer
  *         required: true
+ *         default: 2
  *       - name: limit
  *         in: "query"
  *         description: limit records of graph.
  *         type: integer
+ *         default: 1000
  *     responses:
  *       200:
  *         description: success
