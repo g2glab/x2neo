@@ -191,8 +191,7 @@ export default class Neo4JHandler {
             if (is_traversal) {
                 limit = 1000;
             } else {
-                res.status(400)
-                return
+                limit = 100000;
             }
         }
         if (req.query.node_ids !== undefined) {
