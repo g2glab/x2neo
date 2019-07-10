@@ -37,14 +37,14 @@ function traverse_cypher(query: string, values: Array<string>, iterator: number)
     return "Match (n)-[r]-() WHERE r.country=\"Japan\" RETURN n,r"
 }
 
-function cypher(query: string, values: string | Array<string>): string {
+function cypher(query: string, values: Array<string>): string {
     switch (query) {
         case "node_ids":   
-            return `Match (n)-[r]-(m) WHERE ID(n) in [${typeof values === "string" ? values : values.join(",")}] AND ID(m) in [${typeof values === "string" ? values : values.join(",")}] RETURN n,r,m`
+            return `Match (n)-[r]-(m) WHERE ID(n) in [${values.join(",")}] AND ID(m) in [${typeof values === "string" ? values : values.join(",")}] RETURN n,r,m`
             break;
 
         case "node_labels":
-            return `Match (n)-[r]-(m) WHERE (${typeof values === "string" ? `"${values}" in LABELS(n)` : values.map(value => {return `"${value}" in LABELS(n)`}).join(" OR ")}) AND (${typeof values === "string" ? `"${values}" in LABELS(m)` : values.map(value => {return `"${value}" in LABELS(m)`}).join(" OR ")}) RETURN n,r,m`
+            return `Match (n)-[r]-(m) WHERE (${values.map(value => {return `"${value}" in LABELS(n)`}).join(" OR ")}) AND (${values.map(value => {return `"${value}" in LABELS(m)`}).join(" OR ")}) RETURN n,r,m`
             break;
         
         case "node_props":
@@ -52,11 +52,11 @@ function cypher(query: string, values: string | Array<string>): string {
             break;
 
         case "edge_ids":
-            return `Match (n)-[r]-(m) WHERE ID(r) in [${valuesToArray(values).join(",")}] RETURN *`
+            return `Match (n)-[r]-(m) WHERE ID(r) in [${values.join(",")}] RETURN *`
             break;
 
         case "edge_labels":
-            return `Match (n)-[r]-(m) WHERE TYPE(r) in [${valuesToArray(values).join(",")}] RETURN *`
+            return `Match (n)-[r]-(m) WHERE TYPE(r) in [${values.join(",")}] RETURN *`
             break;
 
         case "edge_props":
@@ -104,7 +104,7 @@ function opts(query: string, values: string | Array<string>, limit: number): any
     return ({
         method: 'POST',
         body: JSON.stringify({"statements" : [ {
-            "statement" : limit > 0 ? cypher(query, values) + ` LIMIT ${limit}` : cypher(query, values),
+            "statement" : limit > 0 ? cypher(query, valuesToArray(values)) + ` LIMIT ${limit}` : cypher(query, valuesToArray(values)),
             "resultDataContents" : [ "row", "graph" ]
         }]}).replace(/\\"/g, '\\"'),
         headers: {'Content-Type': 'application/json', 'accept': 'application/json', 'Authorization': 'Basic bmVvNGo6bmVvNGp0ZXN0'}
@@ -143,33 +143,35 @@ export default class Neo4JHandler {
         let graph = new pg.Graph();
         let node_ids:{[key: string]: boolean;} = {}
         let edge_ids:{[key: string]: boolean;} = {}
-        response.results[0].data.forEach(element => {
-            element.graph.nodes.forEach(node_elem => {
-                let node = new pg.Node(node_elem.id);
-                node_elem.labels.forEach(label => {
-                    node.addLabel(label);
-                })
-                Object.keys(node_elem.properties).forEach(key => {
-                    node.addProperty(key, node_elem.properties[key]);
-                })
-                if (node_ids[node.id] !== true) {
-                    node_ids[node.id] = true;
-                    graph.addNode(node);
-                }
+        if (response.results[0]) {
+            response.results[0].data.forEach(element => {
+                element.graph.nodes.forEach(node_elem => {
+                    let node = new pg.Node(node_elem.id);
+                    node_elem.labels.forEach(label => {
+                        node.addLabel(label);
+                    })
+                    Object.keys(node_elem.properties).forEach(key => {
+                        node.addProperty(key, node_elem.properties[key]);
+                    })
+                    if (node_ids[node.id] !== true) {
+                        node_ids[node.id] = true;
+                        graph.addNode(node);
+                    }
+                });
+                element.graph.relationships.forEach(rel => {
+                    let edge = new pg.Edge(rel.startNode, rel.endNode, false);
+                    edge.addLabel(rel.type);
+                    edge.addProperty('id', rel.id);
+                    Object.keys(rel.properties).forEach(key => {
+                        edge.addProperty(key, rel.properties[key]);
+                    })
+                    if (edge_ids[rel.id] !== true) {
+                        edge_ids[rel.id] = true;
+                        graph.addEdge(edge);
+                    }
+                });
             });
-            element.graph.relationships.forEach(rel => {
-                let edge = new pg.Edge(rel.startNode, rel.endNode, false);
-                edge.addLabel(rel.type);
-                edge.addProperty('id', rel.id);
-                Object.keys(rel.properties).forEach(key => {
-                    edge.addProperty(key, rel.properties[key]);
-                })
-                if (edge_ids[rel.id] !== true) {
-                    edge_ids[rel.id] = true;
-                    graph.addEdge(edge);
-                }
-            });
-        });
+        }
         return graph;
     }
 
