@@ -16,19 +16,19 @@ var router = express.Router()
  *       - application/json
  *     parameters:
  *       - name: node_ids
- *         description: Filter by edges that both ends of edges are included in given node ids.
+ *         description: Filter by edges that either end of edges are included in given node ids.
  *         in: "query"
  *         type: array
  *         items: 
  *           type: integer
  *       - name: node_labels
- *         description: Filter by edges that both ends of edges have any of given node labels.
+ *         description: Filter by edges that either end of edges have any of given node labels.
  *         in: "query"
  *         type: array
  *         items:
  *           type: string
  *       - name: node_props
- *         description: Filter by edges that both ends of edges have any of given node props.
+ *         description: Filter by edges that either end of edges have any of given node props.
  *         type: array
  *         in: "query"
  *         items:
