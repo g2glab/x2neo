@@ -141,6 +141,7 @@ export default class Neo4JHandler {
 
     static neo4jwres2pg(response: any, request: any) {
         let pg = this.neo4j2pg(response);
+        pg = {pg}
         if (request.query.debug === "true" || request.query.debug === true) {
             pg["request"] = request.query
         }
