@@ -141,7 +141,10 @@ export default class Neo4JHandler {
 
     static neo4jwres2pg(response: any, request: any) {
         let pg = this.neo4j2pg(response);
-        
+        if (request.query.debug === "true" || request.query.debug === true) {
+            pg["request"] = request.query
+        }
+        return pg
     }
 
     static neo4j2pg(response: any) {
@@ -214,7 +217,7 @@ export default class Neo4JHandler {
         fetch(url + '/db/data/transaction/commit', options)
             .then(body => body.json())
             //.then(json => res.json(json))
-            .then(json => res.json(Neo4JHandler.neo4j2pg(json)))
+            .then(json => res.json(Neo4JHandler.neo4jwres2pg(json, req)))
             .catch(e => {console.error(e); res.status(500)});
     }
 
@@ -245,7 +248,7 @@ export default class Neo4JHandler {
         fetch(url + '/db/data/transaction/commit', options)
             .then(body => body.json())
             //.then(json => res.json(json))
-            .then(json => res.json(Neo4JHandler.neo4j2pg(json)))
+            .then(json => res.json(Neo4JHandler.neo4jwres2pg(json, req)))
             .catch(e => {console.error(e); res.status(500)});
     }
 
@@ -253,7 +256,7 @@ export default class Neo4JHandler {
         fetch(url + '/db/data/transaction/commit', query_opts(req.query.q))
             .then(body => body.json())
             //.then(json => res.json(json))
-            .then(json => res.json(Neo4JHandler.neo4j2pg(json)))
+            .then(json => res.json(Neo4JHandler.neo4jwres2pg(json, req)))
             .catch(e => {console.error(e); res.status(500)});
     }
 
