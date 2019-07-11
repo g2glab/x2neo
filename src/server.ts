@@ -28,7 +28,7 @@ var options = {
             }
         },
     },
-    apis: ['src/*.ts'],
+    apis: ['src/node_matching.ts', 'src/edge_matching.ts', 'src/traversal.ts', 'src/*.ts'],
 };
 
 var swaggerSpec = swaggerJSDoc(options);
@@ -46,8 +46,8 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, ui_options));
 
 // GRAPH API
 
-app.use("/edge_match", edge_matching);
 app.use("/node_match", node_matching);
+app.use("/edge_match", edge_matching);
 app.use("/traversal", traversal);
 app.use("/query", query);
 

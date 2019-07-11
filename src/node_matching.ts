@@ -55,6 +55,10 @@ var router = express.Router()
  *         in: "query"
  *         description: limit records of graph.
  *         type: integer
+ *       - name: debug
+ *         in: "query"
+ *         description: Response includes the queries on request for debugging.
+ *         type: boolean
  *     responses:
  *       200:
  *         description: success
