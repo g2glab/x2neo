@@ -5,6 +5,25 @@ import { stringify } from "querystring";
 let pg = require('./pg.js');
 var ConfigFile = require('config');
 
+function shortest_cypher(query: string, from_values: Array<string>, to_values: Array<string>, k: number): string {
+    switch (query) {
+        case "node_ids":
+            return `MATCH (start), (end) WHERE CALL algo.shortestPath(start, end) YIELD nodeId RETURN nodeId`
+            break;
+        case "node_ids":
+            return `MATCH p=shortestPath((start:airport {city: "Bangkok"})-[rels:has_flight_to*]-(end:airport {city: "Kagoshima"}))
+            RETURN [place in nodes(p) | place.name][1..-1] AS journey,
+                   length(nodes(p)[1..-1]) AS intermediatePlaces,
+                   reduce(s = 0, r in rels | s + r.distance) AS total_distance`
+            break;
+
+        default:
+            break;
+    }
+    return "Match (n)-[r]-() WHERE r.country=\"Japan\" RETURN n,r"
+}
+
+
 function traverse_cypher(query: string, values: Array<string>, iterator: number): string {
     switch (query) {
         case "node_ids":
@@ -133,6 +152,21 @@ function traverse_opts(query: string, values: string | Array<string>, iteration:
     })
 }
 
+
+function shortest_opts(query: string, from_values: string | Array<string>, to_values: string | Array<string>, k: number, limit: number): any {
+    const from = valuesToArray(from_values);
+    const to = valuesToArray(to_values);
+    return ({
+        method: 'POST',
+        body: JSON.stringify({"statements" : [ {
+            "statement" : shortest_cypher(query, from, to, k) + (limit > 0) ? ` LIMIT ${limit}` : ``,
+            "resultDataContents" : [ "row", "graph" ]
+        }]}).replace(/\\"/g, '\\"'),
+        headers: {'Content-Type': 'application/json', 'accept': 'application/json', 'Authorization': 'Basic bmVvNGo6bmVvNGp0ZXN0'}
+    })
+}
+
+
 const url = ConfigFile.db.host + ":"+ ConfigFile.db.port
 
 export default class Neo4JHandler {
@@ -222,10 +256,47 @@ export default class Neo4JHandler {
             .catch(e => {console.error(e); res.status(500)});
     }
 
+    static shortest_path(req: Request, res: Response) {
+        let limit = parseInt(req.query.limit);
+        if (limit <= 0) {
+            res.status(400);
+            return
+        }
+        let k = parseInt(req.query.k);
+        if (Number.isNaN(k) || iteration <= 0) {
+            k = 1
+        }
+
+        var options;
+        if (req.query.node_ids !== undefined) {
+            options = shortest_opts("node_ids", req.query.from_node_ids, req.query.to_node_ids, k, limit);
+        } else if (req.query.node_labels !== undefined) {
+            options = shortest_opts("node_labels", req.query.from_node_labels, req.query.to_node_labels, k, limit);
+        } else if (req.query.node_props !== undefined) {
+            options = shortest_opts("node_props", req.query.from_node_props, req.query.to_node_props, k, limit);
+        } else if (req.query.edge_ids !== undefined) {
+            options = shortest_opts("edge_ids", req.query.from_edge_ids, req.query.to_edge_ids, k, limit);
+        } else if (req.query.edge_labels !== undefined) {
+            options = shortest_opts("edge_labels", req.query.from_edge_labels, req.query.to_edge_labels, k, limit);
+        } else if (req.query.edge_props !== undefined) {
+            options = shortest_opts("edge_props", req.query.from_edge_props, req.query.to_edge_props, k, limit);
+        } else {
+            options = shortest_opts("", "", k, limit);
+        }
+        console.log(req.query, options)
+
+        fetch(url + '/db/data/transaction/commit', options)
+            .then(body => body.json())
+            //.then(json => res.json(json))
+            .then(json => res.json(Neo4JHandler.neo4jwres2pg(json, req)))
+            .catch(e => {console.error(e); res.status(500)});
+    }
+
     static get_graph(req: Request, res: Response) {
         let limit = parseInt(req.query.limit);
         if (limit <= 0) {
             res.status(400);
+            return
         }
 
         var options;
