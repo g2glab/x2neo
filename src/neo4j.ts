@@ -254,6 +254,7 @@ export default class Neo4JHandler {
     }
 
     static query(req: Request, res: Response) {
+        console.log(req.query)
         fetch(url + '/db/data/transaction/commit', query_opts(req.query.q))
             .then(body => body.json())
             //.then(json => res.json(json))
