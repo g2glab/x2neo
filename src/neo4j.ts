@@ -6,21 +6,22 @@ let pg = require('./pg.js');
 var ConfigFile = require('config');
 
 function shortest_cypher(query: string, from_values: Array<string>, to_values: Array<string>, k: number): string {
-    switch (query) {
-        case "node_ids":
-            return `MATCH (start), (end) WHERE CALL algo.shortestPath(start, end) YIELD nodeId RETURN nodeId`
-            break;
-        case "node_ids":
-            return `MATCH p=shortestPath((start:airport {city: "Bangkok"})-[rels:has_flight_to*]-(end:airport {city: "Kagoshima"}))
-            RETURN [place in nodes(p) | place.name][1..-1] AS journey,
-                   length(nodes(p)[1..-1]) AS intermediatePlaces,
-                   reduce(s = 0, r in rels | s + r.distance) AS total_distance`
-            break;
+    let from_node_props_items = {city: "Bangkok"}
+    let to_node_props_items = {city: "Kagoshima"}
 
-        default:
-            break;
-    }
-    return "Match (n)-[r]-() WHERE r.country=\"Japan\" RETURN n,r"
+    const from_node_id = "1000001"
+    if (from_node_id != "") { from_node_props_items["id"] = from_node_id }
+    const from_node_label = ":" + "airport"
+    const from_node_props = JSON.stringify(from_node_props).replace(/\"([^(\")"]+)\":/g,"$1:") // Remove double quotes on keys
+    const to_node_id = "1000002"
+    if (to_node_id != "") { to_node_props_items["id"] = to_node_id }
+    const to_node_label = ":" + "airport"
+    const to_node_props = JSON.stringify(to_node_props).replace(/\"([^(\")"]+)\":/g,"$1:") // Remove double quotes on keys
+    const edge_label = ":" + "has_flight_to"
+    const iteration = "0.." + str(k)
+  
+    return `MATCH p=shortestPath((start${from_node_label} ${from_node_props})-[${edge_label}${iteration}]-(end${to_node_props} ${to_node_props}))
+            RETURN p`
 }
 
 
