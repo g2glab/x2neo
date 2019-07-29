@@ -3,6 +3,7 @@ import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
 var ConfigFile = require('config');
+var compute = require('compute');
 var edge_matching = require('./edge_matching');
 var node_matching = require('/node_matching');
 var traversal = require('/traversal');
@@ -50,6 +51,7 @@ app.use("/node_match", node_matching);
 app.use("/edge_match", edge_matching);
 app.use("/traversal", traversal);
 app.use("/query", query);
+app.use("/compute", compute);
 
 app.get("/", (_req: Request, res: Response) => res.send("X2 API"));
 
