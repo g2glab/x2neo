@@ -3,10 +3,10 @@ import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
 var ConfigFile = require('config');
-var compute = require('compute');
+var compute = require('./compute');
 var edge_matching = require('./edge_matching');
-var node_matching = require('/node_matching');
-var traversal = require('/traversal');
+var node_matching = require('./node_matching');
+var traversal = require('./traversal');
 var query = require('./query');
 
 const app = express();
