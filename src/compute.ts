@@ -69,10 +69,10 @@ var router = express.Router()
  *         description: invalid parameter
  */
 
-router.get('/shortest_path', function (req: Request, res: Response) {
+router.get('/shortest', function (req: Request, res: Response) {
     switch (ConfigFile.db.dbms) {
         case "neo4j":
-            Neo4JHandler.shortest(req, res)
+            Neo4JHandler.shortest_path(req, res)
             break;
     
         default:
