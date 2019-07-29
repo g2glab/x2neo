@@ -5,20 +5,20 @@ import { stringify } from "querystring";
 let pg = require('./pg.js');
 var ConfigFile = require('config');
 
-function shortest_cypher(query: string, from_values: Array<string>, to_values: Array<string>, k: number): string {
-    let from_node_props_items = {city: "Bangkok"}
-    let to_node_props_items = {city: "Kagoshima"}
+function shortest_cypher(query: any, k: number): string {
+    let from_node_props_items = query.from_node_props || {}; // {city: "Bangkok"}
+    let to_node_props_items = query.to_node_props || {}; // {city: "Kagoshima"}
 
-    const from_node_id = "1000001"
-    if (from_node_id != "") { from_node_props_items["id"] = from_node_id }
-    const from_node_label = ":" + "airport"
-    const from_node_props = JSON.stringify(from_node_props).replace(/\"([^(\")"]+)\":/g,"$1:") // Remove double quotes on keys
-    const to_node_id = "1000002"
-    if (to_node_id != "") { to_node_props_items["id"] = to_node_id }
-    const to_node_label = ":" + "airport"
-    const to_node_props = JSON.stringify(to_node_props).replace(/\"([^(\")"]+)\":/g,"$1:") // Remove double quotes on keys
-    const edge_label = ":" + "has_flight_to"
-    const iteration = "0.." + str(k)
+    const from_node_id = query.from_node_id; // "1000002"
+    if (from_node_id != "") { from_node_props_items["id"] = from_node_id };
+    const from_node_label = query.from_node_label ? ":" + query.from_node_label : ""; //  "airport"
+    const from_node_props = JSON.stringify(from_node_props).replace(/\"([^(\")"]+)\":/g,"$1:"); // Remove double quotes on keys
+    const to_node_id = query.to_node_id; //"1000002"
+    if (to_node_id != "") { to_node_props_items["id"] = to_node_id };
+    const to_node_label = query.to_node_label ? ":" + query.to_node_label : "" ; //":" + "airport"
+    const to_node_props = JSON.stringify(to_node_props).replace(/\"([^(\")"]+)\":/g,"$1:"); // Remove double quotes on keys
+    const edge_label = query.edge_label ? ":" + query.edge_label : ""; // "has_flight_to"
+    const iteration = "0.." + str(k);
   
     return `MATCH p=shortestPath((start${from_node_label} ${from_node_props})-[${edge_label}${iteration}]-(end${to_node_props} ${to_node_props}))
             RETURN p`
@@ -154,13 +154,11 @@ function traverse_opts(query: string, values: string | Array<string>, iteration:
 }
 
 
-function shortest_opts(query: string, from_values: string | Array<string>, to_values: string | Array<string>, k: number, limit: number): any {
-    const from = valuesToArray(from_values);
-    const to = valuesToArray(to_values);
+function shortest_opts(query: any, k: number, limit: number): any {
     return ({
         method: 'POST',
         body: JSON.stringify({"statements" : [ {
-            "statement" : shortest_cypher(query, from, to, k) + (limit > 0) ? ` LIMIT ${limit}` : ``,
+            "statement" : shortest_cypher(query, k) + (limit > 0) ? ` LIMIT ${limit}` : ``,
             "resultDataContents" : [ "row", "graph" ]
         }]}).replace(/\\"/g, '\\"'),
         headers: {'Content-Type': 'application/json', 'accept': 'application/json', 'Authorization': 'Basic bmVvNGo6bmVvNGp0ZXN0'}
@@ -263,27 +261,11 @@ export default class Neo4JHandler {
             res.status(400);
             return
         }
-        let k = parseInt(req.query.k);
-        if (Number.isNaN(k) || iteration <= 0) {
+        let k = parseInt(req.query.k); // The maximum distance of graphs; the maximum is 100 (hard-coded.)
+        if (Number.isNaN(k) || k > 100) {
             k = 1
         }
-
-        var options;
-        if (req.query.node_ids !== undefined) {
-            options = shortest_opts("node_ids", req.query.from_node_ids, req.query.to_node_ids, k, limit);
-        } else if (req.query.node_labels !== undefined) {
-            options = shortest_opts("node_labels", req.query.from_node_labels, req.query.to_node_labels, k, limit);
-        } else if (req.query.node_props !== undefined) {
-            options = shortest_opts("node_props", req.query.from_node_props, req.query.to_node_props, k, limit);
-        } else if (req.query.edge_ids !== undefined) {
-            options = shortest_opts("edge_ids", req.query.from_edge_ids, req.query.to_edge_ids, k, limit);
-        } else if (req.query.edge_labels !== undefined) {
-            options = shortest_opts("edge_labels", req.query.from_edge_labels, req.query.to_edge_labels, k, limit);
-        } else if (req.query.edge_props !== undefined) {
-            options = shortest_opts("edge_props", req.query.from_edge_props, req.query.to_edge_props, k, limit);
-        } else {
-            options = shortest_opts("", "", k, limit);
-        }
+        const options = shortest_opts(req.query, k, limit);
         console.log(req.query, options)
 
         fetch(url + '/db/data/transaction/commit', options)
