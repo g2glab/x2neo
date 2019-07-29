@@ -260,6 +260,8 @@ export default class Neo4JHandler {
         if (limit <= 0) {
             res.status(400);
             return
+        } else if (Number.isNaN(limit)) {
+            limit = 100000
         }
         let k = parseInt(req.query.k); // The maximum distance of graphs; the maximum is 100 (hard-coded.)
         if (Number.isNaN(k) || k > 100) {
