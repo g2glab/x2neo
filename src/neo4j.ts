@@ -20,8 +20,7 @@ function shortest_cypher(query: any, k: number): string {
     const edge_label = query.edge_label ? ":" + query.edge_label : ""; // "has_flight_to"
     const iteration = "0.." + k.toString();
   
-    return `MATCH p=shortestPath((start${from_node_label} ${from_node_props})-[${edge_label}${iteration}]-(end${to_node_props} ${to_node_props}))
-            RETURN p`
+    return `MATCH p=shortestPath((start${from_node_label} ${from_node_props})-[${edge_label}${iteration}]-(end${to_node_label} ${to_node_props})) RETURN p`
 }
 
 
@@ -155,10 +154,11 @@ function traverse_opts(query: string, values: string | Array<string>, iteration:
 
 
 function shortest_opts(query: any, k: number, limit: number): any {
+    const q = shortest_cypher(query, k)
     return ({
         method: 'POST',
         body: JSON.stringify({"statements" : [ {
-            "statement" : shortest_cypher(query, k) + (limit > 0) ? ` LIMIT ${limit}` : ``,
+            "statement" : (limit > 0) ? `${q} LIMIT ${limit}` : q,
             "resultDataContents" : [ "row", "graph" ]
         }]}).replace(/\\"/g, '\\"'),
         headers: {'Content-Type': 'application/json', 'accept': 'application/json', 'Authorization': 'Basic bmVvNGo6bmVvNGp0ZXN0'}
