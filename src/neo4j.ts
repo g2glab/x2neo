@@ -12,11 +12,11 @@ function shortest_cypher(query: any, k: number): string {
     const from_node_id = query.from_node_id; // "1000002"
     if (from_node_id != "") { from_node_props_hash["id"] = from_node_id };
     const from_node_label = query.from_node_label ? ":" + query.from_node_label : ""; //  "airport"
-    const from_node_props = JSON.stringify(from_node_props_hash).replace(/\"([^(\")"]+)\":/g,"$1:"); // Remove double quotes on keys
+    const from_node_props = JSON.stringify(from_node_props_hash).replace(/\"([^(\")"]+)\":/g,"$1:").replace(/\\"/g, '\\"'); // Remove double quotes on keys
     const to_node_id = query.to_node_id; //"1000002"
     if (to_node_id != "") { to_node_props_hash["id"] = to_node_id };
     const to_node_label = query.to_node_label ? ":" + query.to_node_label : "" ; //":" + "airport"
-    const to_node_props = JSON.stringify(to_node_props_hash).replace(/\"([^(\")"]+)\":/g,"$1:"); // Remove double quotes on keys
+    const to_node_props = JSON.stringify(to_node_props_hash).replace(/\"([^(\")"]+)\":/g,"$1:").replace(/\\"/g, '\\"'); // Remove double quotes on keys
     const edge_label = query.edge_label ? ":" + query.edge_label : ""; // "has_flight_to"
     const iteration = "0.." + k.toString();
   
