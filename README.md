@@ -12,11 +12,14 @@ docker run \
   neo4j:3.5.5                # 3.5.5 is the latest on Jun 2
 ```
 
+`node` is pre-required.
+
 ```bash
-yarn build &
-yarn watch
+$ yarn install
+$ yarn build
+$ yarn start
 ```
 
 Access to `http://localhost:3000/`.
 
-`http://localhost:3000/api-docs` provides swagger-UI of this API definition.
+`http://localhost:3000/api-docs` provides a swagger-UI of this API definition.
