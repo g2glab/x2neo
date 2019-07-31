@@ -311,7 +311,7 @@ export default class Neo4JHandler {
 
     static query(req: Request, res: Response) {
         console.log(req.query)
-        if (request.query.raw === "true" || request.query.raw === true) {
+        if (req.query.raw === "true" || req.query.raw === true) {
             fetch(url + '/db/data/transaction/commit', query_opts(req.query.q))
                 .then(body => body.json())
                 .then(json => res.json(json))
