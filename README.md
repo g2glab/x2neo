@@ -1,4 +1,6 @@
-# X2
+# X2: A Universal Graph Adapter
+
+### Getting Start
 
 Pull and run Neo4j Docker container.
 
