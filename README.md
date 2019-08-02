@@ -1,4 +1,10 @@
-# X2
+# X2: A Universal Graph Adapter
+
+We collected useful queries for graph visualization and provided them as REST API. X2 saves your time from annoying queries for graph database.
+
+In addition, every endpoint returns a property graph exchange format called PG-JSON, by converting various outputs of graph databases.
+
+### Getting Started
 
 Pull and run Neo4j Docker container.
 
