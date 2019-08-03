@@ -1,4 +1,4 @@
-# X2: A Universal Graph Adapter
+# X2: A Universal Graph-DB Adapter
 
 We collected useful queries for graph visualization and provided them as REST API. X2 saves your time from annoying queries for graph database.
 
@@ -21,6 +21,8 @@ docker run \
 `node` is pre-required.
 
 ```bash
+$ git clone https://github.com/g2glab/x2
+$ cd x2
 $ yarn install
 $ yarn build
 $ yarn start
