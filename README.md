@@ -1,5 +1,7 @@
 # X2: A Universal Graph-DB Adapter
 
+[Documentation](https://x2.readthedocs.io/en/latest/index.html)
+
 We collected useful queries for graph visualization and provided them as REST API. X2 saves your time from annoying queries for graph database.
 
 In addition, every endpoint returns a property graph exchange format called PG-JSON, by converting various outputs of graph databases.
