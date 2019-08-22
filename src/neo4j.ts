@@ -317,7 +317,7 @@ export default class Neo4JHandler {
         fetch(url + '/db/data/transaction/commit', query_opts(req.query.q))
             .then(body => body.json())
             //.then(json => res.json(json))
-            .then(json => res.json(Neo4JHandler.neo4jwres2pg(json, req, with_raw)))
+            .then(json => res.json(Neo4JHandler.neo4jwres2pg(json, req)))
             .catch(e => {console.error(e); res.status(500)});
     }
 
