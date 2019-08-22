@@ -174,9 +174,12 @@ export default class Neo4JHandler {
 
     static neo4jwres2pg(response: any, request: any) {
         let pg = this.neo4j2pg(response);
-        pg = {pg}
+        pg = {pg};
         if (request.query.debug === "true" || request.query.debug === true) {
-            pg["request"] = request.query
+            pg["request"] = request.query;
+        }
+        if (request.query.raw === "true" || request.query.raw === true) {
+            pg["raw"] = response;
         }
         return pg
     }
@@ -311,18 +314,11 @@ export default class Neo4JHandler {
 
     static query(req: Request, res: Response) {
         console.log(req.query)
-        if (req.query.raw === "true" || req.query.raw === true) {
-            fetch(url + '/db/data/transaction/commit', query_opts(req.query.q))
-                .then(body => body.json())
-                .then(json => res.json(json))
-                .catch(e => {console.error(e); res.status(500)});
-        } else {
-            fetch(url + '/db/data/transaction/commit', query_opts(req.query.q))
-                .then(body => body.json())
-                //.then(json => res.json(json))
-                .then(json => res.json(Neo4JHandler.neo4jwres2pg(json, req)))
-                .catch(e => {console.error(e); res.status(500)});
-        }
+        fetch(url + '/db/data/transaction/commit', query_opts(req.query.q))
+            .then(body => body.json())
+            //.then(json => res.json(json))
+            .then(json => res.json(Neo4JHandler.neo4jwres2pg(json, req, with_raw)))
+            .catch(e => {console.error(e); res.status(500)});
     }
 
 }
