@@ -175,10 +175,10 @@ export default class Neo4JHandler {
     static neo4jwres2pg(response: any, request: any) {
         let pg = this.neo4j2pg(response);
         pg = {pg};
-        if (request.query.debug.toLowerCase() === "true" || request.query.debug === true) {
+        if (request.query.debug && (request.query.debug.toLowerCase() === "true" || request.query.debug === true)) {
             pg["request"] = request.query;
         }
-        if (request.query.raw.toLowerCase() === "true" || request.query.raw === true) {
+        if (request.query.raw && (request.query.raw.toLowerCase() === "true" || request.query.raw === true)) {
             pg["raw"] = response;
         }
         return pg
