@@ -141,6 +141,24 @@ function query_opts(query: string): any {
     })
 }
 
+function profile_opts(profile_type: string): any {
+    var statement;
+    if (profile_type === "node") {
+        statement = "CALL db.labels()"
+    } else if (profile_type === "edge") {
+        statement = "CALL db.relationshipTypes()"
+    }
+    return ({
+        method: 'POST',
+        body: JSON.stringify({"statements" : [ {
+            "statement" : statement,
+            "resultDataContents" : [ "row", "graph" ]
+        }]}).replace(/\\"/g, '\\"'),
+        headers: {'Content-Type': 'application/json', 'accept': 'application/json', 'Authorization': 'Basic bmVvNGo6bmVvNGp0ZXN0'}
+    })
+}
+
+
 function traverse_opts(query: string, values: string | Array<string>, iteration: number, limit: number): any {
     return ({
         method: 'POST',
@@ -308,6 +326,14 @@ export default class Neo4JHandler {
         fetch(url + '/db/data/transaction/commit', options)
             .then(body => body.json())
             //.then(json => res.json(json))
+            .then(json => res.json(Neo4JHandler.neo4jwres2pg(json, req)))
+            .catch(e => {console.error(e); res.status(500)});
+    }
+    
+    static profile_graph(req: Request, res: Response) {
+        console.log(req.query)
+        fetch(url + '/db/data/transaction/commit', profile_opts(req.query.type))
+            .then(body => body.json())
             .then(json => res.json(Neo4JHandler.neo4jwres2pg(json, req)))
             .catch(e => {console.error(e); res.status(500)});
     }
