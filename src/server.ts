@@ -8,6 +8,7 @@ var edge_matching = require('./edge_matching');
 var node_matching = require('./node_matching');
 var traversal = require('./traversal');
 var query = require('./query');
+var profile = require('./profile');
 
 const app = express();
 
@@ -52,6 +53,7 @@ app.use("/edge_match", edge_matching);
 app.use("/traversal", traversal);
 app.use("/query", query);
 app.use("/compute", compute);
+app.use("/profile", profile);
 
 app.get("/", (_req: Request, res: Response) => res.send("X2 API"));
 
