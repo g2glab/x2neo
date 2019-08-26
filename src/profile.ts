@@ -14,6 +14,14 @@ var router = express.Router()
  *     description: Get data profiling of graphs
  *     produces:
  *       - application/json
+ *     parameters:
+ *       - name: type
+ *         description: Request types of metadata.
+ *         in: "query"
+ *         type: string
+ *         enum:
+ *           - node
+ *           - edge
  *     responses:
  *       200:
  *         description: success
