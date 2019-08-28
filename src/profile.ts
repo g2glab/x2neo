@@ -20,6 +20,7 @@ var router = express.Router()
  *         in: "query"
  *         type: string
  *         enum:
+ *           - all
  *           - node
  *           - edge
  *     responses:
