@@ -147,6 +147,8 @@ function profile_opts(profile_type: string): any {
         statement = "CALL db.labels()"
     } else if (profile_type === "edge") {
         statement = "CALL db.relationshipTypes()"
+    } else {
+        statement = "MATCH (n)-[r]-(n2) WITH labels(n) AS ln, r UNWIND ln as lns RETURN collect(distinct(lns)) AS nodes, collect(distinct(type(r))) AS edges"
     }
     return ({
         method: 'POST',
