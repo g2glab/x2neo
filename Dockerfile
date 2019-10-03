@@ -12,7 +12,10 @@ ENV PARCEL_WORKERS=1
 
 RUN npm install
 
-COPY --chown=node:node . .
+COPY . .
+# COPY --chown node:node . .
+
+RUN chown node:node .
 
 RUN npm run build
 
