@@ -57,4 +57,4 @@ app.use("/profile", profile);
 
 app.get("/", (_req: Request, res: Response) => res.send("X2 API"));
 
-app.listen(ConfigFile.web.port, () => console.log("Example app listening on port " + ConfigFile.web.port));
+app.listen(ConfigFile.web.port, () => console.log("X2 listening on port " + ConfigFile.web.port));
