@@ -275,7 +275,7 @@ export default class Neo4JHandler {
             .then(body => body.json())
             //.then(json => res.json(json))
             .then(json => res.json(Neo4JHandler.neo4jwres2pg(json, req)))
-            .catch(e => {console.error(e); res.status(500)});
+            .catch(e => {console.error(e); res.status(500).send({ error: 'FetchError: request to backend.' })});
     }
 
     static shortest_path(req: Request, res: Response) {
@@ -297,7 +297,7 @@ export default class Neo4JHandler {
             .then(body => body.json())
             //.then(json => res.json(json))
             .then(json => res.json(Neo4JHandler.neo4jwres2pg(json, req)))
-            .catch(e => {console.error(e); res.status(500)});
+            .catch(e => {console.error(e); res.status(500).send({ error: 'FetchError: request to backend.' })});
     }
 
     static get_graph(req: Request, res: Response) {
@@ -329,7 +329,7 @@ export default class Neo4JHandler {
             .then(body => body.json())
             //.then(json => res.json(json))
             .then(json => res.json(Neo4JHandler.neo4jwres2pg(json, req)))
-            .catch(e => {console.error(e); res.status(500)});
+            .catch(e => {console.error(e); res.status(500).send({ error: 'FetchError: request to backend.' })});
     }
     
     static profile_graph(req: Request, res: Response) {
@@ -337,7 +337,7 @@ export default class Neo4JHandler {
         fetch(url + '/db/data/transaction/commit', profile_opts(req.query.type))
             .then(body => body.json())
             .then(json => res.json(Neo4JHandler.neo4jwres2pg(json, req)))
-            .catch(e => {console.error(e); res.status(500)});
+            .catch(e => {console.error(e); res.status(500).send({ error: 'FetchError: request to backend.' })});
     }
 
     static query(req: Request, res: Response) {
@@ -346,7 +346,7 @@ export default class Neo4JHandler {
             .then(body => body.json())
             //.then(json => res.json(json))
             .then(json => res.json(Neo4JHandler.neo4jwres2pg(json, req)))
-            .catch(e => {console.error(e); res.status(500)});
+            .catch(e => {console.error(e); res.status(500).send({ error: 'FetchError: request to backend.' })});
     }
 
 }
