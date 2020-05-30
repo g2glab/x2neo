@@ -6,7 +6,7 @@ var router = express.Router()
 
 /**
  * @swagger
- * /compute/shortest:
+ * /shortest:
  *   get:
  *     summary: "Graph Computation"
  *     tags:
@@ -69,7 +69,7 @@ var router = express.Router()
  *         description: invalid parameter
  */
 
-router.get('/shortest', function (req: Request, res: Response) {
+router.get('', function (req: Request, res: Response) {
     switch (ConfigFile.db.dbms) {
         case "neo4j":
             Neo4JHandler.shortest_path(req, res)
