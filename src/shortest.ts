@@ -6,7 +6,7 @@ var router = express.Router()
 
 /**
  * @swagger
- * /compute/shortest:
+ * /shortest:
  *   get:
  *     summary: "Graph Computation"
  *     tags:
@@ -47,12 +47,14 @@ var router = express.Router()
  *         description: Filter by edges such that those label equals the given label.
  *         type: string
  *         in: "query"
- *       - name: iteration
+ *       - name: max_hops
  *         in: "query"
- *         description: the number of iteration (>=0).
+ *         description: the number of maximum hops (>=0).
  *         type: integer
- *         required: true
- *         default: 2
+ *       - name: min_hops
+ *         in: "query"
+ *         description: the number of minimum hops (>=0).
+ *         type: integer
  *       - name: limit
  *         in: "query"
  *         description: limit records of graph.
@@ -69,7 +71,7 @@ var router = express.Router()
  *         description: invalid parameter
  */
 
-router.get('/shortest', function (req: Request, res: Response) {
+router.get('', function (req: Request, res: Response) {
     switch (ConfigFile.db.dbms) {
         case "neo4j":
             Neo4JHandler.shortest_path(req, res)
