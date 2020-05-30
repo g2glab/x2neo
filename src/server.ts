@@ -24,7 +24,7 @@ var options = {
     swaggerDefinition: {
         info: {
             title: 'X2 API',
-            version: '1.0.0',
+            version: '0.2.0',
             license: {
                 name: "MIT"
             }
