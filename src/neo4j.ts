@@ -18,7 +18,7 @@ function shortest_cypher(query: any, k: number | string, m: number): string {
     const to_node_label = query.to_node_label ? ":" + query.to_node_label : "" ; //":" + "airport"
     const to_node_props = JSON.stringify(to_node_props_hash).replace(/\"([^(\")"]+)\":/g,"$1:").replace(/\\"/g, '\\"'); // Remove double quotes on keys
     const edge_label = query.edge_label ? ":" + query.edge_label : "*"; // "has_flight_to"
-    let iteration = "*";
+    let iteration = edge_label == "*" ? "" : "*";
     if (k !== "*" || m !== 0) {
         iteration = m.toString() + ".." + k.toString()
     }
