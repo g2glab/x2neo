@@ -49,15 +49,20 @@ var router = express.Router()
  *         in: "query"
  *       - name: max_hops
  *         in: "query"
- *         description: the number of maximum hops (>=0).
+ *         description: The number of maximum hops (>=0).
  *         type: integer
  *       - name: min_hops
  *         in: "query"
- *         description: the number of minimum hops (>=0).
+ *         description: The number of minimum hops (>=0).
  *         type: integer
+ *       - name: topk
+ *         in: "query"
+ *         description: Retrieve the top-k shortest path.
+ *         type: integer
+ *         default: 1
  *       - name: limit
  *         in: "query"
- *         description: limit records of graph.
+ *         description: Limit records of graph.
  *         type: integer
  *         default: 1000
  *       - name: debug
