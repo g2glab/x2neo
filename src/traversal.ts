@@ -51,9 +51,9 @@ var router = express.Router()
  *         items: 
  *           type: string
  *         in: "query"
- *       - name: iteration
+ *       - name: hops
  *         in: "query"
- *         description: the number of iteration (>=0).
+ *         description: the number of hops (>=0).
  *         type: integer
  *         required: true
  *         default: 2
