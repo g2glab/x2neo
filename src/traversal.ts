@@ -51,9 +51,9 @@ var router = express.Router()
  *         items: 
  *           type: string
  *         in: "query"
- *       - name: iteration
+ *       - name: max_hops
  *         in: "query"
- *         description: the number of iteration (>=0).
+ *         description: the number of maximal iteration (>=0).
  *         type: integer
  *         required: true
  *         default: 2
