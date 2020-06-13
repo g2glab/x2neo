@@ -5,7 +5,7 @@ import { stringify } from "querystring";
 let pg = require('./pg.js');
 var ConfigFile = require('config');
 
-function shortest_cypher(query: any, k: number | string, m: number, is_cycle: boolean): string {
+function shortest_cypher(query: any, k: number | string, m: number): string {
     let from_node_props_hash = query.from_node_props || {}; // {city: "Bangkok"}
     let to_node_props_hash = query.to_node_props || {}; // {city: "Kagoshima"}
 
@@ -21,23 +21,33 @@ function shortest_cypher(query: any, k: number | string, m: number, is_cycle: bo
     const to_node_props = JSON.stringify(to_node_props_hash).replace(/\"([^(\")"]+)\":/g,"$1:").replace(/\\"/g, '\\"'); // Remove double quotes on keys
     const edge_label = query.edge_label ? ":" + query.edge_label : "*"; // "has_flight_to"
     let iteration = edge_label == "*" ? "" : "*";
-/*    if (k > 0) {
-        const k = k - 1;
-    }*/
+    if (k !== "*" || m !== 0) {
+        iteration = m.toString() + ".." + k.toString()
+    }
+    return `MATCH p=shortestPath((start${from_node_label} ${from_node_props})-[${edge_label}${iteration}]-(end${to_node_label} ${to_node_props})) ${where} RETURN p`
+}
+
+function cycle_cypher(query: any, k: number | string, m: number): string {
+    let node_props_hash = query.node_props || {}; // {city: "Kagoshima"}
+
+    let where = "";
+    const node_id = query.from_node_id;
+    if (node_id !== "") { where += `WHERE id(start) = ${node_id} AND id(end) = ${node_id}` };
+    const node_label = query.node_label ? ":" + query.node_label : ""; //  "airport"
+    const node_props = JSON.stringify(node_props_hash).replace(/\"([^(\")"]+)\":/g,"$1:").replace(/\\"/g, '\\"'); // Remove double quotes on keys
+    const edge_label = query.edge_label ? ":" + query.edge_label : "*"; // "has_flight_to"
+    const edge_first_label = query.edge_label ? "" : (":" + query.edge_label);
+    let iteration = edge_label == "*" ? "" : "*";
     const max_hops = (k > 0) ? k - 1 : k
     if (k !== "*" || m !== 0) {
         iteration = m.toString() + ".." + max_hops.toString()
     }
-    if (is_cycle === true) {
-        return `MATCH
-        (start${from_node_label} ${from_node_props})-[e]->(m2),
-        cyclePath=shortestPath((m2)-[${edge_label}${iteration}]-(end${to_node_label} ${to_node_props}))
-        ${where}
-          WITH m1, nodes(cyclePath) as cycle 
-        RETURN m1, cycle`
-    } else {
-        return `MATCH p=shortestPath((start${from_node_label} ${from_node_props})-[${edge_label}${iteration}]-(end${to_node_label} ${to_node_props})) ${where} RETURN p`
-    }
+    return `MATCH
+    (start${node_label} ${node_props})-[e${edge_first_label}]->(m2),
+    cyclePath=shortestPath((m2)-[${edge_label}${iteration}]-(end${node_label} ${node_props}))
+    ${where}
+        WITH start, nodes(cyclePath) as cycle 
+    RETURN start, cycle`
 }
 
 
@@ -190,7 +200,7 @@ function traverse_opts(query: string, values: string | Array<string>, iteration:
 }
 
 function shortest_opts(query: any, k: number, m: number, limit: number, is_cycle: boolean): any {
-    const q = shortest_cypher(query, k, m, is_cycle)
+    const q = is_cycle ? cycle_cypher(query, k, m) : shortest_cypher(query, k, m);
     return ({
         method: 'POST',
         body: JSON.stringify({"statements" : [ {
