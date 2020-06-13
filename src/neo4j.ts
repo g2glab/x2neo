@@ -26,7 +26,7 @@ function shortest_cypher(query: any, k: number | string, m: number, is_cycle: bo
     if (k !== "*" || m !== 0) {
         iteration = m.toString() + ".." + max_hops.toString()
     }
-    if (is_cycle) {
+    if (is_cycle === true) {
         return `MATCH
         ((start${from_node_label} ${from_node_props})-[e]->(m2),
         cyclePath=shortestPath((m2)-[${edge_label}${iteration}]-(end${to_node_label} ${to_node_props}))
