@@ -45,7 +45,7 @@ function cycle_cypher(query: any, k: number | string, m: number): string {
     return `MATCH
     (start${node_label} ${node_props})-[e${edge_first_label}]->(m2),
     cyclePath=shortestPath((m2)-[${edge_label}${iteration}]-(end${node_label} ${node_props}))
-    ${where} RETURN start, cyclePath`
+    ${where} RETURN start, e, cyclePath`
 }
 
 
