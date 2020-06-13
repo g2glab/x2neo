@@ -15,30 +15,16 @@ var router = express.Router()
  *     produces:
  *       - application/json
  *     parameters:
- *       - name: from_node_id
+ *       - name: node_id
  *         description: Specify a source node that has given node id.
  *         in: "query"
  *         type: integer
- *       - name: from_node_label
+ *       - name: node_label
  *         description: Specify a source node that has given node label.
  *         in: "query"
  *         type: string
- *       - name: from_node_props
+ *       - name: node_props
  *         description: Specify a source node that has given node props.
- *         type: array
- *         in: "query"
- *         items:
- *           type: string
- *       - name: to_node_id
- *         description: Specify a target node that has given node id.
- *         in: "query"
- *         type: integer
- *       - name: to_node_label
- *         description: Specify a target node that has given node label.
- *         in: "query"
- *         type: string
- *       - name: to_node_props
- *         description: Specify a target node that has given node props.
  *         type: array
  *         in: "query"
  *         items:
