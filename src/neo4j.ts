@@ -188,7 +188,7 @@ function shortest_opts(query: any, k: number, m: number, limit: number): any {
     return ({
         method: 'POST',
         body: JSON.stringify({"statements" : [ {
-            "statement" : (limit > 0) ? `${q} LIMIT ${limit}` : q,
+            "statement" : (limit > 0) ? `${q}` : q,
             "resultDataContents" : [ "row", "graph" ]
         }]}).replace(/\\"/g, '\\"'),
         headers: {'Content-Type': 'application/json', 'accept': 'application/json', 'Authorization': 'Basic bmVvNGo6bmVvNGp0ZXN0'}
