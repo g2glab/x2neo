@@ -53,7 +53,7 @@ var router = express.Router()
  *         type: integer
  *       - name: min_hops
  *         in: "query"
- *         description: the number of minimum hops (>=0).
+ *         description: the number of minimum hops (0<=min_hops<=1 in neo4j).
  *         type: integer
  *       - name: limit
  *         in: "query"
