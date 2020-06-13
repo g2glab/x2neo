@@ -11,7 +11,7 @@ var router = express.Router()
  *     summary: "Graph Computation"
  *     tags:
  *       - name: Computation
- *     description: Find a shortest paths for the query.
+ *     description: Find shortest paths for the query.
  *     produces:
  *       - application/json
  *     parameters:
