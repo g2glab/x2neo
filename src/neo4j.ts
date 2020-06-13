@@ -22,7 +22,7 @@ function shortest_cypher(query: any, k: number | string, m: number): string {
     const edge_label = query.edge_label ? ":" + query.edge_label : "*"; // "has_flight_to"
     let iteration = edge_label == "*" ? "" : "*";
     if (k !== "*" || m !== 0) {
-        iteration = m.toString() + ".." + k.toString()
+        iteration = m.toString() + ".." + (k.toString() === "*" ? "" : k.toString())
     }
     return `MATCH p=shortestPath((start${from_node_label} ${from_node_props})-[${edge_label}${iteration}]-(end${to_node_label} ${to_node_props})) ${where} RETURN p`
 }
@@ -38,9 +38,10 @@ function cycle_cypher(query: any, k: number | string, m: number): string {
     const edge_label = query.edge_label ? ":" + query.edge_label : "*"; // "has_flight_to"
     const edge_first_label = query.edge_label ? (":" + query.edge_label) : "";
     let iteration = edge_label == "*" ? "" : "*";
-    const max_hops = (k > 0) ? k - 1 : k
+    const max_hops = (k > 0) ? k - 1 : k;
+    const min_hops = (m > 0) ? m - 1 : m;
     if (k !== "*" || m !== 0) {
-        iteration = m.toString() + ".." + max_hops.toString()
+        iteration = min_hops.toString() + ".." + (max_hops.toString() === "*" ? "" : max_hops.toString())
     }
     return `MATCH
     (start${node_label} ${node_props})-[e${edge_first_label}]->(m2),
