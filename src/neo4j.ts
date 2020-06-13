@@ -36,7 +36,7 @@ function cycle_cypher(query: any, k: number | string, m: number): string {
     const node_label = query.node_label ? ":" + query.node_label : ""; //  "airport"
     const node_props = JSON.stringify(node_props_hash).replace(/\"([^(\")"]+)\":/g,"$1:").replace(/\\"/g, '\\"'); // Remove double quotes on keys
     const edge_label = query.edge_label ? ":" + query.edge_label : "*"; // "has_flight_to"
-    const edge_first_label = query.edge_label ? "" : (":" + query.edge_label);
+    const edge_first_label = query.edge_label ? (":" + query.edge_label) : "";
     let iteration = edge_label == "*" ? "" : "*";
     const max_hops = (k > 0) ? k - 1 : k
     if (k !== "*" || m !== 0) {
