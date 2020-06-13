@@ -53,6 +53,7 @@ app.use("/edge_match", edge_matching);
 app.use("/traversal", traversal);
 app.use("/query", query);
 app.use("/shortest", shortest);
+app.use("/cycle", shortest);
 app.use("/profile", profile);
 
 app.get("/", (_req: Request, res: Response) => res.send("X2 API"));
