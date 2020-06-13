@@ -5,7 +5,7 @@ import { stringify } from "querystring";
 let pg = require('./pg.js');
 var ConfigFile = require('config');
 
-function shortest_cypher(query: any, k: number | string, m: number): string {
+function shortest_cypher(query: any, k: number | string, m: number, is_cycle: boolean): string {
     let from_node_props_hash = query.from_node_props || {}; // {city: "Bangkok"}
     let to_node_props_hash = query.to_node_props || {}; // {city: "Kagoshima"}
 
@@ -175,8 +175,8 @@ function traverse_opts(query: string, values: string | Array<string>, iteration:
 }
 
 
-function shortest_opts(query: any, k: number, m: number, limit: number): any {
-    const q = shortest_cypher(query, k, m)
+function shortest_opts(query: any, k: number, m: number, limit: number, is_cycle: boolean): any {
+    const q = shortest_cypher(query, k, m, is_cycle)
     return ({
         method: 'POST',
         body: JSON.stringify({"statements" : [ {
@@ -280,7 +280,7 @@ export default class Neo4JHandler {
             .catch(e => {console.error(e); res.status(500).send({ error: 'FetchError: request to backend.' })});
     }
 
-    static shortest_path(req: Request, res: Response) {
+    static shortest_path(req: Request, res: Response, is_cycle: boolean) {
         let limit = parseInt(req.query.limit);
         if (limit <= 0) {
             res.status(400);
@@ -300,7 +300,7 @@ export default class Neo4JHandler {
         if (Number.isNaN(m) || m < 0) {
             m = 0
         }
-        const options = shortest_opts(req.query, k, m, limit);
+        const options = shortest_opts(req.query, k, m, limit, is_cycle);
         console.log(req.query, options)
 
         fetch(url + '/db/data/transaction/commit', options)
