@@ -7,6 +7,7 @@ var shortest = require('./shortest');
 var edge_matching = require('./edge_matching');
 var node_matching = require('./node_matching');
 var traversal = require('./traversal');
+var cycle = require('./cycle');
 var query = require('./query');
 var profile = require('./profile');
 
@@ -53,7 +54,7 @@ app.use("/edge_match", edge_matching);
 app.use("/traversal", traversal);
 app.use("/query", query);
 app.use("/shortest", shortest);
-app.use("/cycle", shortest);
+app.use("/cycle", cycle);
 app.use("/profile", profile);
 
 app.get("/", (_req: Request, res: Response) => res.send("X2 API"));

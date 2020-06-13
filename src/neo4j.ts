@@ -6,7 +6,6 @@ let pg = require('./pg.js');
 var ConfigFile = require('config');
 
 function shortest_cypher(query: any, k: number | string, m: number, is_cycle: boolean): string {
-    console.log(is_cycle);
     let from_node_props_hash = query.from_node_props || {}; // {city: "Bangkok"}
     let to_node_props_hash = query.to_node_props || {}; // {city: "Kagoshima"}
 
@@ -190,9 +189,7 @@ function traverse_opts(query: string, values: string | Array<string>, iteration:
     })
 }
 
-
 function shortest_opts(query: any, k: number, m: number, limit: number, is_cycle: boolean): any {
-    console.log(is_cycle);
     const q = shortest_cypher(query, k, m, is_cycle)
     return ({
         method: 'POST',
@@ -298,7 +295,6 @@ export default class Neo4JHandler {
     }
 
     static shortest_path(req: Request, res: Response, is_cycle: boolean) {
-        console.log(is_cycle);
         let limit = parseInt(req.query.limit);
         if (limit <= 0) {
             res.status(400);
