@@ -22,7 +22,15 @@ function shortest_cypher(query: any, k: number | string, m: number, is_cycle: bo
     if (k !== "*" || m !== 0) {
         iteration = m.toString() + ".." + k.toString()
     }
-    return `MATCH p=shortestPath((start${from_node_label} ${from_node_props})-[${edge_label}${iteration}]-(end${to_node_label} ${to_node_props})) RETURN p`
+    if (is_cycle) {
+        return `MATCH
+        ((start${from_node_label} ${from_node_props})-[e]->(m2),
+        cyclePath=shortestPath((m2)-[${edge_label}${iteration}]-(end${to_node_label} ${to_node_props}))
+          WITH m1, nodes(cyclePath) as cycle
+        RETURN m1, cycle`
+    } else {
+        return `MATCH p=shortestPath((start${from_node_label} ${from_node_props})-[${edge_label}${iteration}]-(end${to_node_label} ${to_node_props})) RETURN p`
+    }
 }
 
 
