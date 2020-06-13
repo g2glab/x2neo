@@ -16,6 +16,7 @@ function shortest_cypher(query: any, k: number | string, m: number, is_cycle: bo
     const from_node_props = JSON.stringify(from_node_props_hash).replace(/\"([^(\")"]+)\":/g,"$1:").replace(/\\"/g, '\\"'); // Remove double quotes on keys
     const to_node_id = query.to_node_id;
     if (to_node_id !== "") { where += `ID(end) = ${to_node_id}` };
+    if (where !== "") { where = `WHERE ${where}` }
     const to_node_label = query.to_node_label ? ":" + query.to_node_label : "" ; //":" + "airport"
     const to_node_props = JSON.stringify(to_node_props_hash).replace(/\"([^(\")"]+)\":/g,"$1:").replace(/\\"/g, '\\"'); // Remove double quotes on keys
     const edge_label = query.edge_label ? ":" + query.edge_label : "*"; // "has_flight_to"
