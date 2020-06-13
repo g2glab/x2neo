@@ -11,11 +11,11 @@ function shortest_cypher(query: any, k: number | string, m: number, is_cycle: bo
 
     let where = "";
     const from_node_id = query.from_node_id;
-    if (from_node_id !== "") { where += `ID(start) = ${from_node_id} ` };
+    if (from_node_id !== "") { where += `id(start) = ${from_node_id} ` };
     const from_node_label = query.from_node_label ? ":" + query.from_node_label : ""; //  "airport"
     const from_node_props = JSON.stringify(from_node_props_hash).replace(/\"([^(\")"]+)\":/g,"$1:").replace(/\\"/g, '\\"'); // Remove double quotes on keys
     const to_node_id = query.to_node_id;
-    if (to_node_id !== "") { where += (where === "") ? `ID(end) = ${to_node_id}` : `AND ID(end) = ${to_node_id}`  };
+    if (to_node_id !== "") { where += (where === "") ? `id(end) = ${to_node_id}` : `AND id(end) = ${to_node_id}`  };
     if (where !== "") { where = `WHERE ${where}` }
     const to_node_label = query.to_node_label ? ":" + query.to_node_label : "" ; //":" + "airport"
     const to_node_props = JSON.stringify(to_node_props_hash).replace(/\"([^(\")"]+)\":/g,"$1:").replace(/\\"/g, '\\"'); // Remove double quotes on keys
@@ -30,7 +30,7 @@ function shortest_cypher(query: any, k: number | string, m: number, is_cycle: bo
     }
     if (is_cycle === true) {
         return `MATCH
-        ((start${from_node_label} ${from_node_props})-[e]->(m2),
+        (start${from_node_label} ${from_node_props})-[e]->(m2),
         cyclePath=shortestPath((m2)-[${edge_label}${iteration}]-(end${to_node_label} ${to_node_props}))
         ${where}
           WITH m1, nodes(cyclePath) as cycle 
