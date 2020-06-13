@@ -43,7 +43,7 @@ var router = express.Router()
  *         type: integer
  *       - name: limit
  *         in: "query"
- *         description: limit records of graph.
+ *         description: limit paths of graph.
  *         type: integer
  *         default: 1000
  *       - name: debug

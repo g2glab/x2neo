@@ -31,7 +31,7 @@ function cycle_cypher(query: any, k: number | string, m: number): string {
     let node_props_hash = query.node_props || {}; // {city: "Kagoshima"}
 
     let where = "";
-    const node_id = query.from_node_id;
+    const node_id = query.node_id;
     if (node_id !== "") { where += `WHERE id(start) = ${node_id} AND id(end) = ${node_id}` };
     const node_label = query.node_label ? ":" + query.node_label : ""; //  "airport"
     const node_props = JSON.stringify(node_props_hash).replace(/\"([^(\")"]+)\":/g,"$1:").replace(/\\"/g, '\\"'); // Remove double quotes on keys
