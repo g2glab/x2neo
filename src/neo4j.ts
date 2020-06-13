@@ -22,7 +22,15 @@ function shortest_cypher(query: any, k: number | string, m: number): string {
     if (k !== "*" || m !== 0) {
         iteration = m.toString() + ".." + k.toString()
     }
-    return `MATCH p=shortestPath((start${from_node_label} ${from_node_props})-[${edge_label}${iteration}]-(end${to_node_label} ${to_node_props})) RETURN p`
+    let topk = query.topk ? parseInt(query.topk) : 1;
+    if (Number.isNaN(topk) || topk <= 0) {
+        topk = 1
+    }
+    if (topk === 1) {
+        return `MATCH p=shortestPath((start${from_node_label} ${from_node_props})-[${edge_label}${iteration}]-(end${to_node_label} ${to_node_props})) RETURN p`
+    } else {
+        return `MATCH p=allShortestPath((start${from_node_label} ${from_node_props})-[${edge_label}${iteration}]-(end${to_node_label} ${to_node_props})) ORDER BY LENGTH(path) ASC LIMIT ${topk}`
+    }
 }
 
 
