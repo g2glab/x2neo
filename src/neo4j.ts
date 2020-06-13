@@ -244,7 +244,7 @@ export default class Neo4JHandler {
 
     static traverse_graph(req: Request, res: Response, is_traversal: boolean) {
         var options;
-        let iteration = is_traversal ? parseInt(req.query.hops) : 1;
+        let iteration = is_traversal ? parseInt(req.query.max_hops) : 1;
         if (Number.isNaN(iteration) || iteration < 0) {
             iteration = 2
         }
