@@ -6,12 +6,12 @@ var router = express.Router()
 
 /**
  * @swagger
- * /shortest:
+ * /cycle:
  *   get:
  *     summary: "Graph Computation"
  *     tags:
  *       - name: Computation
- *     description: Find a shortest paths for the query.
+ *     description: Find a cycle for the query.
  *     produces:
  *       - application/json
  *     parameters:
@@ -74,7 +74,7 @@ var router = express.Router()
 router.get('', function (req: Request, res: Response) {
     switch (ConfigFile.db.dbms) {
         case "neo4j":
-            Neo4JHandler.shortest_path(req, res, false)
+            Neo4JHandler.shortest_path(req, res, true)
             break;
     
         default:
