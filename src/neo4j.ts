@@ -22,7 +22,15 @@ function shortest_cypher(query: any, k: number | string, m: number): string {
     if (k !== "*" || m !== 0) {
         iteration = m.toString() + ".." + k.toString()
     }
-    return `MATCH p=shortestPath((start${from_node_label} ${from_node_props})-[${edge_label}${iteration}]-(end${to_node_label} ${to_node_props})) RETURN p`
+    let topk = query.topk ? parseInt(query.topk) : 1;
+    if (Number.isNaN(topk) || topk <= 0) {
+        topk = 1
+    }
+    if (topk === 1) {
+        return `MATCH p=shortestPath((start${from_node_label} ${from_node_props})-[${edge_label}${iteration}]-(end${to_node_label} ${to_node_props})) RETURN p`
+    } else {
+        return `MATCH p=allShortestPaths((start${from_node_label} ${from_node_props})-[${edge_label}${iteration}]-(end${to_node_label} ${to_node_props})) RETURN p ORDER BY LENGTH(p) ASC LIMIT ${topk}`
+    }
 }
 
 
@@ -180,7 +188,7 @@ function shortest_opts(query: any, k: number, m: number, limit: number): any {
     return ({
         method: 'POST',
         body: JSON.stringify({"statements" : [ {
-            "statement" : (limit > 0) ? `${q} LIMIT ${limit}` : q,
+            "statement" : q,
             "resultDataContents" : [ "row", "graph" ]
         }]}).replace(/\\"/g, '\\"'),
         headers: {'Content-Type': 'application/json', 'accept': 'application/json', 'Authorization': 'Basic bmVvNGo6bmVvNGp0ZXN0'}
