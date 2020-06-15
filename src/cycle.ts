@@ -11,7 +11,7 @@ var router = express.Router()
  *     summary: "Graph Computation"
  *     tags:
  *       - name: Computation
- *     description: Find a cycle for the query.
+ *     description: Find a cycle on the directed graph.
  *     produces:
  *       - application/json
  *     parameters:

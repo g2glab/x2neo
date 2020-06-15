@@ -42,14 +42,23 @@ function cycle_cypher(query: any, k: number | string, m: number): string {
     const edge_first_label = query.edge_label ? (":" + query.edge_label) : "";
     let iteration = edge_label == "*" ? "" : "*";
     const max_hops = (k > 0) ? k - 1 : k;
-    const min_hops = (m > 0) ? ((m > 2) ? 2 :  m - 1) : m;
+    const min_hops = (m > 0) ? ((m > 2) ? 2 : m - 1) : m;
     if (k !== "*" || m !== 0) {
         iteration = min_hops.toString() + ".." + (max_hops.toString() === "*" ? "" : max_hops.toString())
     }
     return `MATCH
     (start${node_label} ${node_props})-[e${edge_first_label}]->(m2),
-    cyclePath=shortestPath((m2)-[${edge_label}${iteration}]-(end${node_label} ${node_props}))
+    cyclePath=shortestPath((m2)-[${edge_label}${iteration}]->(end${node_label} ${node_props}))
     ${where} RETURN start, e, cyclePath`
+
+    /* 
+    const edge_label = query.edge_label ? "e:" + query.edge_label : "e";
+    `MATCH
+    (start${node_label} ${node_props})-[e${edge_first_label}]-(m2),
+    cyclePath=shortestPath((m2)-[${edge_label}${iteration}]-(end${node_label} ${node_props}))
+    ${where} AND NOT (NOT e in p ) RETURN start, e, cyclePath` 
+    // but it fails due to shortestPath cannot select 2-top query. Currently undirected graph is not supported.
+    */
 }
 
 
