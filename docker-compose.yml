@@ -1,0 +1,30 @@
+version: '2.1'
+services:
+  neo4j:
+    image: neo4j:4.1
+    ports:
+     - "7474"
+     - "7687"
+    user: 1000:1000
+    restart: always
+    environment:
+     #- EXTENSION_SCRIPT=/neo4j/neo4j-init.sh
+     - NEO4J_AUTH=neo4j/letmein
+    volumes:
+     - ./neo4j:/neo4j
+     #- ./neo4j/logs:/logs
+     - ./neo4j/conf:/var/lib/neo4j/conf
+    networks:
+     - server
+  x2:
+    ports:
+     - "3000:3000"
+    image: g2glab/x2
+    #volumes:
+    # - ./config:/home/node/app/config
+    links:
+     - neo4j:neo4j
+    networks:
+     - server
+networks:
+  server:
