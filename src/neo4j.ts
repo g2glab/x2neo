@@ -174,6 +174,17 @@ function traverse_opts(query: string, values: string | Array<string>, iteration:
     })
 }
 
+function pagerank_opts(query: any, k: number, m: number, limit: number): any {
+    const q = pagerank_cypher(query, k, m)
+    return ({
+        method: 'POST',
+        body: JSON.stringify({"statements" : [ {
+            "statement" : (limit > 0) ? `${q} LIMIT ${limit}` : q,
+            "resultDataContents" : [ "row", "graph" ]
+        }]}).replace(/\\"/g, '\\"'),
+        headers: {'Content-Type': 'application/json', 'accept': 'application/json', 'Authorization': 'Basic bmVvNGo6bmVvNGp0ZXN0'}
+    })
+}
 
 function shortest_opts(query: any, k: number, m: number, limit: number): any {
     const q = shortest_cypher(query, k, m)
@@ -271,6 +282,36 @@ export default class Neo4JHandler {
         } else {
             res.status(400);
         }
+        console.log(req.query, options)
+
+        fetch(url + '/db/data/transaction/commit', options)
+            .then(body => body.json())
+            //.then(json => res.json(json))
+            .then(json => res.json(Neo4JHandler.neo4jwres2pg(json, req)))
+            .catch(e => {console.error(e); res.status(500).send({ error: 'FetchError: request to backend.' })});
+    }
+
+    static personalized_pagerank(req: Request, res: Response) {
+        let limit = parseInt(req.query.limit);
+        if (limit <= 0) {
+            res.status(400);
+            return
+        } else if (Number.isNaN(limit)) {
+            limit = 100000
+        }
+        let k = parseInt(req.query.max_hops); // The maximum distance of graphs; the maximum is 100 (hard-coded.)
+        let m = parseInt(req.query.min_hops);
+        if (!Number.isNaN(k) && m > k) {
+            res.status(400)
+            return
+        }        
+        if (Number.isNaN(k) || k > 100) {
+            k = "*"
+        }
+        if (Number.isNaN(m) || m < 0) {
+            m = 0
+        }
+        const options = pagerank_opts(req.query, k, m, limit);
         console.log(req.query, options)
 
         fetch(url + '/db/data/transaction/commit', options)
