@@ -1,7 +1,7 @@
 version: '2.1'
 services:
   neo4j:
-    image: neo4j:4.1
+    build: ./neo4j
     ports:
      - "7474"
      - "7687"
@@ -9,6 +9,11 @@ services:
     restart: always
     environment:
      #- EXTENSION_SCRIPT=/neo4j/neo4j-init.sh
+     - NEO4J_dbms_security_procedures_unrestricted=gds.*
+     - NEO4J_dbms_security_procedures_whitelist=gds.*
+     - NEO4J_apoc_import_file_enabled=true
+     - NEO4J_apoc_export_file_enabled=true
+     - NEO4J_dbms_shell_enabled=true
      - NEO4J_AUTH=neo4j/letmein
     volumes:
      - ./neo4j:/neo4j
@@ -26,5 +31,6 @@ services:
      - neo4j:neo4j
     networks:
      - server
+    restart: always
 networks:
   server:
