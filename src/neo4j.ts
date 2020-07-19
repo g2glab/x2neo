@@ -5,6 +5,27 @@ import { stringify } from "querystring";
 let pg = require('./pg.js');
 var ConfigFile = require('config');
 
+function pagerank_cypher(query: any, k: number | string, m: number): string {
+    let from_node_props_hash = query.from_node_props || {}; // {city: "Bangkok"}
+    let to_node_props_hash = query.to_node_props || {}; // {city: "Kagoshima"}
+
+    const from_node_id = query.from_node_id;
+    if (from_node_id !== "") { from_node_props_hash["id"] = from_node_id };
+    const from_node_label = query.from_node_label ? ":" + query.from_node_label : ""; //  "airport"
+    const from_node_props = JSON.stringify(from_node_props_hash).replace(/\"([^(\")"]+)\":/g,"$1:").replace(/\\"/g, '\\"'); // Remove double quotes on keys
+    const to_node_id = query.to_node_id;
+    if (to_node_id !== "") { to_node_props_hash["id"] = to_node_id };
+    const to_node_label = query.to_node_label ? ":" + query.to_node_label : "" ; //":" + "airport"
+    const to_node_props = JSON.stringify(to_node_props_hash).replace(/\"([^(\")"]+)\":/g,"$1:").replace(/\\"/g, '\\"'); // Remove double quotes on keys
+    const edge_label = query.edge_label ? ":" + query.edge_label : "*"; // "has_flight_to"
+    let iteration = edge_label == "*" ? "" : "*";
+    if (k !== "*" || m !== 0) {
+        iteration = m.toString() + ".." + k.toString()
+    }
+    return `MATCH p=shortestPath((start${from_node_label} ${from_node_props})-[${edge_label}${iteration}]-(end${to_node_label} ${to_node_props})) RETURN p`
+}
+
+
 function shortest_cypher(query: any, k: number | string, m: number): string {
     let from_node_props_hash = query.from_node_props || {}; // {city: "Bangkok"}
     let to_node_props_hash = query.to_node_props || {}; // {city: "Kagoshima"}
