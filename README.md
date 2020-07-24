@@ -1,6 +1,6 @@
 # X2: A Universal Graph-DB Adapter
 
-[Documentation](https://x2.readthedocs.io/en/latest/index.html)
+[![](https://images.microbadger.com/badges/version/g2glab/x2.svg)](https://microbadger.com/images/g2glab/x2 "Get your own version badge on microbadger.com") [Documentation](https://x2.readthedocs.io/en/latest/index.html)
 
 We collected useful queries for graph visualization and provided them as REST API. X2 saves your time from annoying queries for graph database.
 

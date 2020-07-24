@@ -6,39 +6,25 @@ var router = express.Router()
 
 /**
  * @swagger
- * /shortest:
+ * /cycle:
  *   get:
  *     summary: "Graph Computation"
  *     tags:
  *       - name: Computation
- *     description: Find shortest paths for the query.
+ *     description: Find a cycle on the directed graph.
  *     produces:
  *       - application/json
  *     parameters:
- *       - name: from_node_id
+ *       - name: node_id
  *         description: Specify a source node that has given node id.
  *         in: "query"
  *         type: integer
- *       - name: from_node_label
+ *       - name: node_label
  *         description: Specify a source node that has given node label.
  *         in: "query"
  *         type: string
- *       - name: from_node_props
+ *       - name: node_props
  *         description: Specify a source node that has given node props.
- *         type: array
- *         in: "query"
- *         items:
- *           type: string
- *       - name: to_node_id
- *         description: Specify a target node that has given node id.
- *         in: "query"
- *         type: integer
- *       - name: to_node_label
- *         description: Specify a target node that has given node label.
- *         in: "query"
- *         type: string
- *       - name: to_node_props
- *         description: Specify a target node that has given node props.
  *         type: array
  *         in: "query"
  *         items:
@@ -53,7 +39,7 @@ var router = express.Router()
  *         type: integer
  *       - name: min_hops
  *         in: "query"
- *         description: the number of minimum hops (0<=min_hops<=1 in neo4j).
+ *         description: the number of minimum hops (0<=min_hops<=2 in neo4j).
  *         type: integer
  *       - name: limit
  *         in: "query"
@@ -74,7 +60,7 @@ var router = express.Router()
 router.get('', function (req: Request, res: Response) {
     switch (ConfigFile.db.dbms) {
         case "neo4j":
-            Neo4JHandler.shortest_path(req, res, false)
+            Neo4JHandler.shortest_path(req, res, true)
             break;
     
         default:

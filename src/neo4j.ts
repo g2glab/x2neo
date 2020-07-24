@@ -41,20 +41,56 @@ function shortest_cypher(query: any, k: number | string, m: number): string {
     let from_node_props_hash = query.from_node_props || {}; // {city: "Bangkok"}
     let to_node_props_hash = query.to_node_props || {}; // {city: "Kagoshima"}
 
+    let where = "";
     const from_node_id = query.from_node_id;
-    if (from_node_id !== "") { from_node_props_hash["id"] = from_node_id };
+    if (from_node_id !== "") { where += `id(start) = ${from_node_id} ` };
     const from_node_label = query.from_node_label ? ":" + query.from_node_label : ""; //  "airport"
     const from_node_props = JSON.stringify(from_node_props_hash).replace(/\"([^(\")"]+)\":/g,"$1:").replace(/\\"/g, '\\"'); // Remove double quotes on keys
     const to_node_id = query.to_node_id;
-    if (to_node_id !== "") { to_node_props_hash["id"] = to_node_id };
+    if (to_node_id !== "") { where += (where === "") ? `id(end) = ${to_node_id}` : `AND id(end) = ${to_node_id}`  };
+    if (where !== "") { where = `WHERE ${where}` }
     const to_node_label = query.to_node_label ? ":" + query.to_node_label : "" ; //":" + "airport"
     const to_node_props = JSON.stringify(to_node_props_hash).replace(/\"([^(\")"]+)\":/g,"$1:").replace(/\\"/g, '\\"'); // Remove double quotes on keys
     const edge_label = query.edge_label ? ":" + query.edge_label : "*"; // "has_flight_to"
     let iteration = edge_label == "*" ? "" : "*";
-    if (k !== "*" || m !== 0) {
-        iteration = m.toString() + ".." + k.toString()
+    if (m >= 2) {
+        m = 1
     }
-    return `MATCH p=shortestPath((start${from_node_label} ${from_node_props})-[${edge_label}${iteration}]-(end${to_node_label} ${to_node_props})) RETURN p`
+    if (k !== "*" || m !== 0) {
+        iteration = m.toString() + ".." + (k.toString() === "*" ? "" : k.toString())
+    }
+    return `MATCH p=shortestPath((start${from_node_label} ${from_node_props})-[${edge_label}${iteration}]-(end${to_node_label} ${to_node_props})) ${where} RETURN p`
+}
+
+function cycle_cypher(query: any, k: number | string, m: number): string {
+    let node_props_hash = query.node_props || {}; // {city: "Kagoshima"}
+
+    let where = "";
+    const node_id = query.node_id;
+    if (node_id !== "") { where += `WHERE id(start) = ${node_id} AND id(end) = ${node_id}` };
+    const node_label = query.node_label ? ":" + query.node_label : ""; //  "airport"
+    const node_props = JSON.stringify(node_props_hash).replace(/\"([^(\")"]+)\":/g,"$1:").replace(/\\"/g, '\\"'); // Remove double quotes on keys
+    const edge_label = query.edge_label ? ":" + query.edge_label : "*"; // "has_flight_to"
+    const edge_first_label = query.edge_label ? (":" + query.edge_label) : "";
+    let iteration = edge_label == "*" ? "" : "*";
+    const max_hops = (k > 0) ? k - 1 : k;
+    const min_hops = (m > 0) ? ((m > 2) ? 2 : m - 1) : m;
+    if (k !== "*" || m !== 0) {
+        iteration = min_hops.toString() + ".." + (max_hops.toString() === "*" ? "" : max_hops.toString())
+    }
+    return `MATCH
+    (start${node_label} ${node_props})-[e${edge_first_label}]->(m2),
+    cyclePath=shortestPath((m2)-[${edge_label}${iteration}]->(end${node_label} ${node_props}))
+    ${where} RETURN start, e, cyclePath`
+
+    /* 
+    const edge_label = query.edge_label ? "e:" + query.edge_label : "e";
+    `MATCH
+    (start${node_label} ${node_props})-[e${edge_first_label}]-(m2),
+    cyclePath=shortestPath((m2)-[${edge_label}${iteration}]-(end${node_label} ${node_props}))
+    ${where} AND NOT (NOT e in p ) RETURN start, e, cyclePath` 
+    // but it fails due to shortestPath cannot select 2-top query. Currently undirected graph is not supported.
+    */
 }
 
 
@@ -218,8 +254,8 @@ function pagerank_opts(query: any, k: number, m: number, limit: number): any {
     })
 }
 
-function shortest_opts(query: any, k: number, m: number, limit: number): any {
-    const q = shortest_cypher(query, k, m)
+function shortest_opts(query: any, k: number, m: number, limit: number, is_cycle: boolean): any {
+    const q = is_cycle ? cycle_cypher(query, k, m) : shortest_cypher(query, k, m);
     return ({
         method: 'POST',
         body: JSON.stringify({"statements" : [ {
@@ -353,7 +389,7 @@ export default class Neo4JHandler {
             .catch(e => {console.error(e); res.status(500).send({ error: 'FetchError: request to backend.' })});
     }
 
-    static shortest_path(req: Request, res: Response) {
+    static shortest_path(req: Request, res: Response, is_cycle: boolean) {
         let limit = parseInt(req.query.limit);
         if (limit <= 0) {
             res.status(400);
@@ -373,7 +409,7 @@ export default class Neo4JHandler {
         if (Number.isNaN(m) || m < 0) {
             m = 0
         }
-        const options = shortest_opts(req.query, k, m, limit);
+        const options = shortest_opts(req.query, k, m, limit, is_cycle);
         console.log(req.query, options)
 
         fetch(url + '/db/data/transaction/commit', options)
