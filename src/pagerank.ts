@@ -11,7 +11,7 @@ var router = express.Router()
  *     summary: "Graph Computation"
  *     tags:
  *       - name: Computation
- *     description: Attach personalized pagerank in each node.
+ *     description: Write personalized pagerank value on each node.
  *     produces:
  *       - application/json
  *     parameters:
@@ -47,14 +47,14 @@ var router = express.Router()
  *         description: Filter by edges such that those label equals the given label.
  *         type: string
  *         in: "query"
- *       - name: max_hops
+ *       - name: max_iterations
  *         in: "query"
- *         description: the number of maximum hops (>=0).
+ *         description: the maximum number of iterations of pagerank  (>=0).
  *         type: integer
- *       - name: min_hops
+ *       - name: dumpling_factor
  *         in: "query"
- *         description: the number of minimum hops (>=0).
- *         type: integer
+ *         description: the damping factor of the pagerank calculation. (>=0).
+ *         type: float
  *       - name: limit
  *         in: "query"
  *         description: limit records of graph.
