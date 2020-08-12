@@ -245,6 +245,7 @@ export default class Neo4JHandler {
         let graph = new pg.Graph();
         let node_ids:{[key: string]: boolean;} = {}
         let edge_ids:{[key: string]: boolean;} = {}
+        console.log(response);
         if (response.results[0]) {
             response.results[0].data.forEach(element => {
                 element.graph.nodes.forEach(node_elem => {
