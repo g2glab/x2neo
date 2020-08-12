@@ -1,3 +1,4 @@
+var ConfigFile = require('config');
 
 const body = {
     "statements" : [ {
@@ -9,5 +10,5 @@ const body = {
 const default_options = {
     method: 'POST',
     body: JSON.stringify(body).replace(/\\"/g, '\\"'),
-    headers: {'Content-Type': 'application/json', 'accept': 'application/json', 'Authorization': 'Basic bmVvNGo6bmVvNGp0ZXN0'}
+    headers: {'Content-Type': 'application/json', 'accept': 'application/json', 'Authorization': ConfigFile.db.auth}
 }
