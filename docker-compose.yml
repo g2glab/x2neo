@@ -14,7 +14,7 @@ services:
      - NEO4J_apoc_import_file_enabled=true
      - NEO4J_apoc_export_file_enabled=true
      - NEO4J_dbms_shell_enabled=true
-     - NEO4J_AUTH=neo4j/letmein
+     - NEO4J_AUTH=neo4j/neo4jtest
     volumes:
      - ./neo4j:/neo4j
      #- ./neo4j/logs:/logs
