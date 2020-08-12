@@ -10,5 +10,5 @@ const body = {
 const default_options = {
     method: 'POST',
     body: JSON.stringify(body).replace(/\\"/g, '\\"'),
-    headers: {'Content-Type': 'application/json', 'accept': 'application/json', 'Authorization': ConfigFile.db.auth}
+    headers: {'Content-Type': 'application/json', 'accept': 'application/json', 'Authorization': ConfigFile.db.auth || 'Basic bmVvNGo6bmVvNGp0ZXN0'}
 }

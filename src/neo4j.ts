@@ -164,7 +164,7 @@ function opts(query: string, values: string | Array<string>, limit: number): any
             "statement" : limit > 0 ? cypher(query, valuesToArray(values)) + ` LIMIT ${limit}` : cypher(query, valuesToArray(values)),
             "resultDataContents" : [ "row", "graph" ]
         }]}).replace(/\\"/g, '\\"'),
-        headers: {'Content-Type': 'application/json', 'accept': 'application/json', 'Authorization': ConfigFile.db.auth}
+        headers: {'Content-Type': 'application/json', 'accept': 'application/json', 'Authorization': ConfigFile.db.auth || 'Basic bmVvNGo6bmVvNGp0ZXN0'}
     })
 }
 
@@ -175,7 +175,7 @@ function query_opts(query: string): any {
             "statement" : query,
             "resultDataContents" : [ "row", "graph" ]
         }]}).replace(/\\"/g, '\\"'),
-        headers: {'Content-Type': 'application/json', 'accept': 'application/json', 'Authorization': ConfigFile.db.auth}
+        headers: {'Content-Type': 'application/json', 'accept': 'application/json', 'Authorization': ConfigFile.db.auth || 'Basic bmVvNGo6bmVvNGp0ZXN0'}
     })
 }
 
@@ -194,7 +194,7 @@ function profile_opts(profile_type: string): any {
             "statement" : statement,
             "resultDataContents" : [ "row", "graph" ]
         }]}).replace(/\\"/g, '\\"'),
-        headers: {'Content-Type': 'application/json', 'accept': 'application/json', 'Authorization': ConfigFile.db.auth}
+        headers: {'Content-Type': 'application/json', 'accept': 'application/json', 'Authorization': ConfigFile.db.auth || 'Basic bmVvNGo6bmVvNGp0ZXN0'}
     })
 }
 
@@ -206,7 +206,7 @@ function traverse_opts(query: string, values: string | Array<string>, iteration:
             "statement" : limit > 0 ? traverse_cypher(query, valuesToArray(values), iteration) + ` LIMIT ${limit}` :  traverse_cypher(query, valuesToArray(values), iteration),
             "resultDataContents" : [ "row", "graph" ]
         }]}).replace(/\\"/g, '\\"'),
-        headers: {'Content-Type': 'application/json', 'accept': 'application/json', 'Authorization': ConfigFile.db.auth}
+        headers: {'Content-Type': 'application/json', 'accept': 'application/json', 'Authorization': ConfigFile.db.auth || 'Basic bmVvNGo6bmVvNGp0ZXN0'}
     })
 }
 
@@ -218,7 +218,7 @@ function shortest_opts(query: any, k: number, m: number, limit: number, is_cycle
             "statement" : (limit > 0) ? `${q} LIMIT ${limit}` : q,
             "resultDataContents" : [ "row", "graph" ]
         }]}).replace(/\\"/g, '\\"'),
-        headers: {'Content-Type': 'application/json', 'accept': 'application/json', 'Authorization': ConfigFile.db.auth}
+        headers: {'Content-Type': 'application/json', 'accept': 'application/json', 'Authorization': ConfigFile.db.auth || 'Basic bmVvNGo6bmVvNGp0ZXN0'}
     })
 }
 
