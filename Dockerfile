@@ -6,7 +6,7 @@ WORKDIR /home/node/app
 
 COPY package*.json ./
 
-COPY console/hellograph.html ./console/hellograph.html
+#COPY console/hellograph.html ./console/hellograph.html
 
 USER node
 
