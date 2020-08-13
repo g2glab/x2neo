@@ -75,7 +75,8 @@
    let domain = $('#url-input').value;
    if(!domain.endsWith('/'))
      domain += '/';
-   domain = 'http://' + domain;
+   if(!domain.startsWith('/'))
+     domain = 'http://' + domain;
    axios.get(domain + `node_match?node_ids=${node_id}`).then((response) => {
      if(add) {
        addGraph(response.data.pg);
