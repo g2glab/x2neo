@@ -56,6 +56,7 @@ app.use("/query", query);
 app.use("/shortest", shortest);
 app.use("/cycle", cycle);
 app.use("/profile", profile);
+app.use("/public", express.static('public'));
 
 app.get("/", (_req: Request, res: Response) => res.send("X2 API"));
 
