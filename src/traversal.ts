@@ -53,13 +53,18 @@ var router = express.Router()
  *         in: "query"
  *       - name: max_hops
  *         in: "query"
- *         description: the number of maximal iteration (>=0).
+ *         description: The number of maximal iteration (>=0).
  *         type: integer
  *         required: true
  *         default: 2
+ *       - name: directed
+ *         in: "query"
+ *         description: Consider only forward-edge when the traversal is computed.
+ *         type: boolean
+ *         default: true
  *       - name: limit
  *         in: "query"
- *         description: limit records of graph.
+ *         description: Limit records of graph.
  *         type: integer
  *         default: 1000
  *       - name: debug
