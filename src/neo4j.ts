@@ -309,7 +309,7 @@ export default class Neo4JHandler {
         } else {
             res.status(400);
         }
-        console.log(req.query, options)d
+        console.log(req.query, options);
 
         fetch(url + '/db/data/transaction/commit', options)
             .then(body => body.json())
