@@ -56,7 +56,11 @@ exports.Node = function(id) {
 
   this.addProperty = function(key, value) {
     //this.properties.set(key, value);
-    this.properties[key] = value;
+    if (Array.isArray(value)) {
+      this.properties[key] = value;
+    } else {
+      this.properties[key] = [value];
+    }
   }
 }
 
@@ -79,7 +83,11 @@ exports.Edge = function(from, to, undirected) {
 
   this.addProperty = function(key, value) {
     //this.properties.set(key, value);
-    this.properties[key] = value;
+    if (Array.isArray(value)) {
+      this.properties[key] = value;
+    } else {
+      this.properties[key] = [value];
+    }
   }
 }
 
