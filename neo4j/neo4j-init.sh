@@ -10,7 +10,7 @@ if [ ! -f /tmp/neo4j-import-done.flag ]; then
         rm -r /var/lib/neo4j/data/databases/graph.db
     fi
     /var/lib/neo4j/bin/neo4j-admin import --skip-bad-relationships --multiline-fields=true --database graph.db --delimiter '\t' --nodes /neo4j/*.neo.nodes --relationships /neo4j/*.neo.edges
-#    /var/lib/neo4j/bin/neo4j-admin import --multiline-fields=true --database graph.db --delimiter '\t' --nodes /neo4j/graph_complex_all.neo.nodes --relationships /neo4j/graph_complex_all.neo.edges
+
     touch /tmp/neo4j-import-done.flag
 else
     echo "The import has already been made."
