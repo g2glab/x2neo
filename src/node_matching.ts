@@ -51,6 +51,11 @@ var router = express.Router()
  *         items: 
  *           type: string
  *         in: "query"
+ *       - name: directed
+ *         in: "query"
+ *         description: Consider only forward-edge when the Node-matching is computed.
+ *         type: boolean
+ *         default: false
  *       - name: limit
  *         in: "query"
  *         description: limit records of graph.
