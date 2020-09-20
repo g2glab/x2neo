@@ -23,9 +23,9 @@ services:
   x2:
     ports:
      - "3000:3000"
-    image: g2glab/x2
-    #volumes:
-    # - ./config:/home/node/app/config
+    build: .
+    volumes:
+     - ./neo4j/config:/home/node/app/config
     links:
      - neo4j:neo4j
     networks:
