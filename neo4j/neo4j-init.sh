@@ -15,3 +15,6 @@ if [ ! -f /tmp/neo4j-import-done.flag ]; then
 else
     echo "The import has already been made."
 fi
+
+#kill 1
+#kill $(ps aux | grep '[n]eo4j' | awk '{print $2}')
