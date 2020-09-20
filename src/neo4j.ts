@@ -62,36 +62,37 @@ function cycle_cypher(query: any, k: number | string, m: number): string {
 }
 
 
-function traverse_cypher(query: string, values: Array<string>, iterator: number): string {
+function traverse_cypher(query: string, values: Array<string>, iterator: number, directed: boolean): string {
+    const arrow = directed ? "->" : "-";
     switch (query) {
         case "node_ids":
-            return `MATCH p = (n)-[*0..${iterator}]->(node) WHERE ID(n) in [${values.join(",")}] WITH *, relationships(p) AS rels WITH *, nodes(p) AS ns UNWIND rels as r UNWIND ns as na RETURN DISTINCT r, na`
+            return `MATCH p = (n)-[*0..${iterator}]${arrow}(node) WHERE ID(n) in [${values.join(",")}] WITH *, relationships(p) AS rels WITH *, nodes(p) AS ns UNWIND rels as r UNWIND ns as na RETURN DISTINCT r, na`
             break;
         
         case "node_labels":
-            return `MATCH p = (n)-[*0..${iterator}]->(node) WHERE (${values.map(value => {return `"${value}" in LABELS(n)`}).join(" OR ")}) WITH *, relationships(p) AS rels WITH *, nodes(p) AS ns UNWIND rels as r UNWIND ns as na RETURN DISTINCT r, na`
+            return `MATCH p = (n)-[*0..${iterator}]${arrow}(node) WHERE (${values.map(value => {return `"${value}" in LABELS(n)`}).join(" OR ")}) WITH *, relationships(p) AS rels WITH *, nodes(p) AS ns UNWIND rels as r UNWIND ns as na RETURN DISTINCT r, na`
             break;
     
         case "node_props":
-            return `MATCH p = (n)-[*0..${iterator}]->(node) WHERE (${parse_props_as_array(values).map(value => {return `n.${value[0]} = "${value[1]}"`}).join(" OR ")}) WITH *, relationships(p) AS rels WITH *, nodes(p) AS ns UNWIND rels as r UNWIND ns as na RETURN DISTINCT r, na`
+            return `MATCH p = (n)-[*0..${iterator}]${arrow}(node) WHERE (${parse_props_as_array(values).map(value => {return `n.${value[0]} = "${value[1]}"`}).join(" OR ")}) WITH *, relationships(p) AS rels WITH *, nodes(p) AS ns UNWIND rels as r UNWIND ns as na RETURN DISTINCT r, na`
             break;
 
         case "edge_ids":
-            return `MATCH p = ()-[r]-()-[*0..${iterator}]->(node) WHERE ID(r) in [${values.join(",")}] WITH *, relationships(p) AS rels WITH *, nodes(p) AS ns UNWIND rels as r UNWIND ns as na RETURN DISTINCT r, na`
+            return `MATCH p = ()-[r]-()-[*0..${iterator}]${arrow}(node) WHERE ID(r) in [${values.join(",")}] WITH *, relationships(p) AS rels WITH *, nodes(p) AS ns UNWIND rels as r UNWIND ns as na RETURN DISTINCT r, na`
             break;
 
         case "edge_labels":
-            return `MATCH p = ()-[r]-()-[*0..${iterator}]->(node) WHERE TYPE(r) in [${values.join(",")}] WITH *, relationships(p) AS rels WITH *, nodes(p) AS ns UNWIND rels as r UNWIND ns as na RETURN DISTINCT r, na`
+            return `MATCH p = ()-[r]-()-[*0..${iterator}]${arrow}(node) WHERE TYPE(r) in [${values.join(",")}] WITH *, relationships(p) AS rels WITH *, nodes(p) AS ns UNWIND rels as r UNWIND ns as na RETURN DISTINCT r, na`
             break;
 
         case "edge_props":
-            return `MATCH p = ()-[r]-()-[*0..${iterator}]->(node) WHERE ${parse_props_as_array(values).map(value => {return `r.${value[0]} = "${value[1]}"`}).join(" OR ")} WITH *, relationships(p) AS rels WITH *, nodes(p) AS ns UNWIND rels as r UNWIND ns as na RETURN DISTINCT r, na`
+            return `MATCH p = ()-[r]-()-[*0..${iterator}]${arrow}(node) WHERE ${parse_props_as_array(values).map(value => {return `r.${value[0]} = "${value[1]}"`}).join(" OR ")} WITH *, relationships(p) AS rels WITH *, nodes(p) AS ns UNWIND rels as r UNWIND ns as na RETURN DISTINCT r, na`
             break;
 
         default:
             break;
     }
-    return "Match (n)-[r]-() WHERE r.country=\"Japan\" RETURN n,r"
+    return "Match (n)-[r]-() WHERE r.country=\"Japan\" RETURN n,r" // Default cypher
 }
 
 function cypher(query: string, values: Array<string>): string {
@@ -199,11 +200,11 @@ function profile_opts(profile_type: string): any {
 }
 
 
-function traverse_opts(query: string, values: string | Array<string>, iteration: number, limit: number): any {
+function traverse_opts(query: string, values: string | Array<string>, iteration: number, limit: number, directed: boolean): any {
     return ({
         method: 'POST',
         body: JSON.stringify({"statements" : [ {
-            "statement" : limit > 0 ? traverse_cypher(query, valuesToArray(values), iteration) + ` LIMIT ${limit}` :  traverse_cypher(query, valuesToArray(values), iteration),
+            "statement" : limit > 0 ? traverse_cypher(query, valuesToArray(values), iteration, directed) + ` LIMIT ${limit}` :  traverse_cypher(query, valuesToArray(values), iteration, directed),
             "resultDataContents" : [ "row", "graph" ]
         }]}).replace(/\\"/g, '\\"'),
         headers: {'Content-Type': 'application/json', 'accept': 'application/json', 'Authorization': ConfigFile.db.auth || 'Basic bmVvNGo6bmVvNGp0ZXN0'}
@@ -284,6 +285,7 @@ export default class Neo4JHandler {
         if (Number.isNaN(iteration) || iteration < 0) {
             iteration = 2
         }
+        const directed = req.query.directed ? req.query.directed === "true" : is_traversal;
         let limit = parseInt(req.query.limit);
         if (limit <= 0 || Number.isNaN(limit)) {
             if (is_traversal) {
@@ -293,21 +295,21 @@ export default class Neo4JHandler {
             }
         }
         if (req.query.node_ids !== undefined) {
-            options = traverse_opts("node_ids", req.query.node_ids, iteration, limit)
+            options = traverse_opts("node_ids", req.query.node_ids, iteration, limit, directed)
         } else if (req.query.node_labels !== undefined) {
-            options = traverse_opts("node_labels", req.query.node_labels, iteration, limit);
+            options = traverse_opts("node_labels", req.query.node_labels, iteration, limit, directed);
         } else if (req.query.node_props !== undefined) {
-            options = traverse_opts("node_props", req.query.node_props, iteration, limit);
+            options = traverse_opts("node_props", req.query.node_props, iteration, limit, directed);
         } else if (req.query.edge_ids !== undefined) {
-            options = traverse_opts("edge_ids", req.query.edge_ids, iteration, limit);
+            options = traverse_opts("edge_ids", req.query.edge_ids, iteration, limit, directed);
         } else if (req.query.edge_labels !== undefined) {
-            options = traverse_opts("edge_labels", req.query.edge_labels, iteration, limit);
+            options = traverse_opts("edge_labels", req.query.edge_labels, iteration, limit, directed);
         } else if (req.query.edge_props !== undefined) {
-            options = traverse_opts("edge_props", req.query.edge_props, iteration, limit);
+            options = traverse_opts("edge_props", req.query.edge_props, iteration, limit, directed);
         } else {
             res.status(400);
         }
-        console.log(req.query, options)
+        console.log(req.query, options);
 
         fetch(url + '/db/data/transaction/commit', options)
             .then(body => body.json())
