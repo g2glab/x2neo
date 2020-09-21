@@ -1,0 +1,9 @@
+db:
+    dbms: "neo4j"
+    protocol: "http"
+    host: "http://neo4j"
+    port: 7474
+    query: true
+    auth: "Basic bmVvNGo6bmVvNGp0ZXN0"
+web:
+    port: 3000

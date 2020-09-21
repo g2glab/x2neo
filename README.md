@@ -33,3 +33,12 @@ $ yarn start
 Access to `http://localhost:3000/`.
 
 `http://localhost:3000/api-docs` provides a swagger-UI of this API definition.
+
+### Load neo4j CSV on creating nodes
+
+Copy `*.neo.nodes` and `*.neo.edges` on `./neo4j` directory.
+
+```
+$ docker-compose build
+$ docker-compose up
+```
