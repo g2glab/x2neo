@@ -10,7 +10,7 @@ USER node
 
 ENV PARCEL_WORKERS=1
 
-RUN npm install
+RUN yarn install
 
 COPY . .
 # COPY --chown node:node . .
