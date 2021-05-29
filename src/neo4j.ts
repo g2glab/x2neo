@@ -90,9 +90,9 @@ function traverse_cypher(query: string, values: Array<string>, iterator: number,
             break;
 
         default:
+            return "Match (n)-[r]-() RETURN n,r"
             break;
     }
-    return "Match (n)-[r]-() WHERE r.country=\"Japan\" RETURN n,r" // Default cypher
 }
 
 function cypher(query: string, values: Array<string>): string {
@@ -125,7 +125,6 @@ function cypher(query: string, values: Array<string>): string {
             return "Match (n)-[r]-() RETURN n,r"
             break;
     }
-    return "Match (n)-[r]-() WHERE r.country=\"Japan\" RETURN n,r"
 }
 
 function valuesToArray(values: string | Array<string>): Array<string> {
@@ -307,7 +306,7 @@ export default class Neo4JHandler {
         } else if (req.query.edge_props !== undefined) {
             options = traverse_opts("edge_props", req.query.edge_props, iteration, limit, directed);
         } else {
-            res.status(400);
+            options = traverse_opts("", "", iteration, limit, directed);
         }
         console.log(req.query, options);
 
