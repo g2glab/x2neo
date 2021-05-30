@@ -1,6 +1,7 @@
 FROM node:alpine
 
-RUN apk add --no-cache --virtual .gyp python make g++ \
+RUN apk update && apk upgrade \
+    && apk add --no-cache --virtual .gyp python make g++ \
     && apk --no-cache add avahi-dev \
     && npm install mdns \
     && apk del .gyp
