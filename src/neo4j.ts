@@ -5,6 +5,38 @@ import { stringify } from "querystring";
 let pg = require('./pg.js');
 var ConfigFile = require('config');
 
+function pagerank_cypher(query: any, k: number, m: number): string {
+    let from_node_props_hash = query.from_node_props || {}; // {city: "Bangkok"}
+    let to_node_props_hash = query.to_node_props || {}; // {city: "Kagoshima"}
+
+    const from_node_id = query.from_node_id;
+    if (from_node_id !== "") { from_node_props_hash["id"] = from_node_id };
+    const from_node_label = query.from_node_label ? ":" + query.from_node_label : ""; //  "airport"
+    const from_node_props = JSON.stringify(from_node_props_hash).replace(/\"([^(\")"]+)\":/g,"$1:").replace(/\\"/g, '\\"'); // Remove double quotes on keys
+    const edge_label = query.edge_label ? ":" + query.edge_label : "*"; // "has_flight_to"
+    //const to_node_id = query.to_node_id;
+    //if (to_node_id !== "") { to_node_props_hash["id"] = to_node_id };
+    const to_node_label = query.to_node_label ? ":" + query.to_node_label : "" ; //":" + "airport"
+    const to_node_props = JSON.stringify(to_node_props_hash).replace(/\"([^(\")"]+)\":/g, "$1:").replace(/\\"/g, '\\"'); // Remove double quotes on keys
+    
+    let iteration = edge_label == "*" ? "" : "*";
+    return `MATCH (start:${from_node_label} ${from_node_props})
+    CALL gds.pageRank.write({
+        maxIterations: ${k},
+        dampingFactor: ${m},
+        nodeQuery:'MATCH (nodes:${to_node_label} ${to_node_props}) RETURN id(nodes) as id',
+        relationshipQuery:'MATCH (n:${to_node_label})-[r:${edge_label}]->(m:${to_node_label}) RETURN id(n) AS source, id(m) AS target',
+        sourceNodes: [start]
+        writeProperty: 'pagerank'
+    })
+    YIELD nodePropertiesWritten, ranIterations`
+    /*
+    YIELD nodeId, score
+    RETURN gds.util.asNode(nodeId).name AS name, score
+    ORDER BY score DESC, name ASC*/
+}
+
+
 function shortest_cypher(query: any, k: number | string, m: number): string {
     let from_node_props_hash = query.from_node_props || {}; // {city: "Bangkok"}
     let to_node_props_hash = query.to_node_props || {}; // {city: "Kagoshima"}
@@ -210,6 +242,18 @@ function traverse_opts(query: string, values: string | Array<string>, iteration:
     })
 }
 
+function pagerank_opts(query: any, k: number, m: number, limit: number): any {
+    const q = pagerank_cypher(query, k, m)
+    return ({
+        method: 'POST',
+        body: JSON.stringify({"statements" : [ {
+            "statement" : (limit > 0) ? `${q} LIMIT ${limit}` : q,
+            "resultDataContents" : [ "row", "graph" ]
+        }]}).replace(/\\"/g, '\\"'),
+        headers: {'Content-Type': 'application/json', 'accept': 'application/json', 'Authorization': 'Basic bmVvNGo6bmVvNGp0ZXN0'}
+    })
+}
+
 function shortest_opts(query: any, k: number, m: number, limit: number, is_cycle: boolean): any {
     const q = is_cycle ? cycle_cypher(query, k, m) : shortest_cypher(query, k, m);
     return ({
@@ -309,6 +353,36 @@ export default class Neo4JHandler {
             options = traverse_opts("", "", iteration, limit, directed);
         }
         console.log(req.query, options);
+
+        fetch(url + '/db/data/transaction/commit', options)
+            .then(body => body.json())
+            //.then(json => res.json(json))
+            .then(json => res.json(Neo4JHandler.neo4jwres2pg(json, req)))
+            .catch(e => {console.error(e); res.status(500).send({ error: 'FetchError: request to backend.' })});
+    }
+
+    static personalized_pagerank(req: Request, res: Response) {
+        let limit = parseInt(req.query.limit);
+        if (limit <= 0) {
+            res.status(400);
+            return
+        } else if (Number.isNaN(limit)) {
+            limit = 100000
+        }
+        let k = parseInt(req.query.max_iterations); // The maximum distance of graphs; the maximum is 100 (hard-coded.)
+        let m = parseInt(req.query.damping_factor);
+        if (!Number.isNaN(k) && m > k) {
+            res.status(400)
+            return
+        }        
+        if (Number.isNaN(k) || k > 100) {
+            k = 100
+        }
+        if (Number.isNaN(m) || m < 0) {
+            m = 0
+        }
+        const options = pagerank_opts(req.query, k, m, limit);
+        console.log(req.query, options)
 
         fetch(url + '/db/data/transaction/commit', options)
             .then(body => body.json())

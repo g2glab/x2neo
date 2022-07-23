@@ -7,5 +7,4 @@ ENV GDS_URI https://github.com/neo4j/graph-data-science/releases/download/${GDS_
 RUN sh -c 'cd /var/lib/neo4j/plugins && wget "${GDS_URI}"'
 
 EXPOSE 7474 7473 7687
-
 CMD ["neo4j"]
