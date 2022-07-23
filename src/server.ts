@@ -10,6 +10,7 @@ var traversal = require('./traversal');
 var cycle = require('./cycle');
 var query = require('./query');
 var profile = require('./profile');
+var merge_graph = require("./update");
 
 const app = express();
 
@@ -56,6 +57,7 @@ app.use("/query", query);
 app.use("/shortest", shortest);
 app.use("/cycle", cycle);
 app.use("/profile", profile);
+app.use("/merge_graph", merge_graph);
 
 app.get("/", (_req: Request, res: Response) => res.send("X2 API"));
 
